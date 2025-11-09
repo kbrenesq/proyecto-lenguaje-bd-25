@@ -18,5 +18,11 @@
 -- SECUENCIA: FIDE_ESTADOS_SEQ
 -- Descripción: Secuencia para generar IDs únicos para la tabla fide_estados_tb
 -- ---------------------------------------------------------------------
-
 create sequence estados_seq start with 1 increment by 1 nocache nocycle;
+
+
+-- --------------------------------------------------------------
+-- SECUENCIA: TIPOS_USUARIOS_SEQ
+-- Uso: Generar IDs para la tabla FIDE_TIPO_USUARIOS_TB
+-- --------------------------------------------------------------
+create sequence tipos_usuarios_seq start with 1 increment by 1 nocache nocycle;
