@@ -31,9 +31,8 @@ create or replace package fide_smartmotriz_pkg as
     -- Retorna: El ID del estado insertado.
     -- -----------------------------------------------------------------
 
-   procedure insertar_estado (
-      p_estado    in varchar2,
-      p_estado_id out number
+   procedure estados_insertar_estado_sp (
+      p_estado in varchar2
    );
 
    -- -----------------------------------------------------------------
@@ -44,7 +43,7 @@ create or replace package fide_smartmotriz_pkg as
     --   p_estado    - Nuevo nombre del estado.
     -- -----------------------------------------------------------------
 
-   procedure actualizar_estado (
+   procedure estados_actualizar_estado_sp (
       p_estado_id in number,
       p_estado    in varchar2
    );
@@ -56,7 +55,7 @@ create or replace package fide_smartmotriz_pkg as
      --   p_estado_id - ID del estado a eliminar.
      -- -----------------------------------------------------------------
 
-   procedure archivar_estado (
+   procedure estados_archivar_estado_sp (
       p_estado_id in number
    );
 

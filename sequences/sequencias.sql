@@ -19,4 +19,4 @@
 -- Descripción: Secuencia para generar IDs únicos para la tabla fide_estados_tb
 -- ---------------------------------------------------------------------
 
-create sequence fide_estados_seq start with 1 increment by 1 nocache nocycle;
+create sequence estados_seq start with 1 increment by 1 nocache nocycle;
