@@ -149,5 +149,97 @@ create or replace package fide_smartmotriz_pkg as
       p_correo in varchar2
    );
 
+   ---------------------------------------------------------------------
+   -- PUESTOS
+   ---------------------------------------------------------------------
+   procedure puestos_insertar_puesto_sp (
+      p_puesto      in varchar2,
+      p_salario_min in number,
+      p_salario_max in number,
+      p_estado_id   in number
+   );
 
+   procedure puestos_actualizar_puesto_sp (
+      p_puesto_id   in number,
+      p_puesto      in varchar2,
+      p_salario_min in number,
+      p_salario_max in number,
+      p_estado_id   in number
+   );
+
+   procedure puestos_archivar_puesto_sp (
+      p_puesto_id in number
+   );
+    
+    
+    
+   ---------------------------------------------------------------------
+   -- MECANICOS
+   ---------------------------------------------------------------------
+   procedure mecanicos_insertar_mecanico_sp (
+      p_cedula        in varchar2,
+      p_puesto_id     in number,
+      p_fecha_ingreso in date,
+      p_fecha_fin     in date,
+      p_estado_id     in number
+   );
+
+   procedure mecanicos_actualizar_mecanico_sp (
+      p_mecanico_id in number,
+      p_puesto_id   in number,
+      p_fecha_fin   in date,
+      p_estado_id   in number
+   );
+
+   procedure mecanicos_archivar_mecanico_sp (
+      p_mecanico_id in number
+   );
+    
+   ---------------------------------------------------------------------
+   -- REGISTRO_ASISTENCIA
+   ---------------------------------------------------------------------
+   procedure registro_asistencia_insertar_asistencia_sp (
+      p_mecanico_id  in number,
+      p_fecha        in date,
+      p_hora_entrada in timestamp,
+      p_hora_salida  in timestamp,
+      p_estado_id    in number
+   );
+
+   procedure registro_asistencia_actualizar_asistencia_sp (
+      p_mecanico_id in number,
+      p_fecha       in date,
+      p_hora_salida in timestamp,
+      p_estado_id   in number
+   );
+
+   procedure registro_asistencia_archivar_asistencia_sp (
+      p_mecanico_id in number,
+      p_fecha       in date
+   );
+    
+   ---------------------------------------------------------------------
+   -- SALARIO
+   ---------------------------------------------------------------------
+   procedure salarios_insertar_salario_sp (
+      p_mecanico_id   in number,
+      p_salario       in number,
+      p_fecha_inicio  in date,
+      p_fecha_fin     in date,
+      p_motivo_cambio in varchar2,
+      p_estado_id     in number
+   );
+
+   procedure salarios_actualizar_salario_sp (
+      p_salario_id    in number,
+      p_salario       in number,
+      p_fecha_inicio  in date,
+      p_fecha_fin     in date,
+      p_motivo_cambio in varchar2,
+      p_estado_id     in number
+   );
+
+   procedure salarios_archivar_salario_sp (
+      p_salario_id in number
+   );
 end fide_smartmotriz_pkg;

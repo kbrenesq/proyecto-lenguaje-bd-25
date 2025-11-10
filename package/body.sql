@@ -516,5 +516,353 @@ create or replace package body fide_smartmotriz_pkg as
          rollback;
          dbms_output.put_line('Error al eliminar correo: ' || sqlerrm);
    end correos_archivar_correo_sp;
+
+   ---------------------------------------------------------------------
+   -- PUESTOS
+   ---------------------------------------------------------------------
+
+   procedure puestos_insertar_puesto_sp (
+      p_puesto      in varchar2,
+      p_salario_min in number,
+      p_salario_max in number,
+      p_estado_id   in number
+   ) is
+      v_puesto_id fide_puestos_tb.puesto_id%type;
+   begin
+      select puestos_seq.nextval
+        into v_puesto_id
+        from dual;
+      insert into fide_puestos_tb (
+         puesto_id,
+         puesto,
+         salario_max,
+         salario_min,
+         estado_id
+      ) values ( v_puesto_id,
+                 p_puesto,
+                 p_salario_max,
+                 p_salario_min,
+                 p_estado_id );
+      commit;
+      dbms_output.put_line('Puesto insertado con ID: ' || v_puesto_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un puesto con este nombre.');
+      when others then
+         rollback;
+         dbms_output.put_line('Error al insertar puesto: ' || sqlerrm);
+   end puestos_insertar_puesto_sp;
+
+   procedure puestos_actualizar_puesto_sp (
+      p_puesto_id   in number,
+      p_puesto      in varchar2,
+      p_salario_min in number,
+      p_salario_max in number,
+      p_estado_id   in number
+   ) is
+   begin
+      update fide_puestos_tb
+         set puesto = p_puesto,
+             salario_max = p_salario_max,
+             salario_min = p_salario_min,
+             estado_id = p_estado_id
+       where puesto_id = p_puesto_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el puesto con el ID: ' || p_puesto_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Puesto actualizado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al actualizar puesto: ' || sqlerrm);
+   end puestos_actualizar_puesto_sp;
+
+   procedure puestos_archivar_puesto_sp (
+      p_puesto_id in number
+   ) is
+   begin
+      delete from fide_puestos_tb
+       where puesto_id = p_puesto_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el puesto con el ID: ' || p_puesto_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Puesto eliminado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar puesto: ' || sqlerrm);
+   end puestos_archivar_puesto_sp;
+
+   ---------------------------------------------------------------------
+   -- MECÁNICOS
+   ---------------------------------------------------------------------
+
+   procedure mecanicos_insertar_mecanico_sp (
+      p_cedula        in varchar2,
+      p_puesto_id     in number,
+      p_fecha_ingreso in date,
+      p_fecha_fin     in date,
+      p_estado_id     in number
+   ) is
+      v_mecanico_id fide_mecanicos_tb.mecanico_id%type;
+   begin
+      select mecanicos_seq.nextval
+        into v_mecanico_id
+        from dual;
+      insert into fide_mecanicos_tb (
+         mecanico_id,
+         cedula,
+         puesto_id,
+         fecha_ingreso,
+         fecha_fin,
+         estado_id
+      ) values ( v_mecanico_id,
+                 p_cedula,
+                 p_puesto_id,
+                 p_fecha_ingreso,
+                 p_fecha_fin,
+                 p_estado_id );
+      commit;
+      dbms_output.put_line('Mecánico insertado con ID: ' || v_mecanico_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un mecánico con esta cédula.');
+      when others then
+         rollback;
+         dbms_output.put_line('Error al insertar mecánico: ' || sqlerrm);
+   end mecanicos_insertar_mecanico_sp;
+
+   procedure mecanicos_actualizar_mecanico_sp (
+      p_mecanico_id in number,
+      p_puesto_id   in number,
+      p_fecha_fin   in date,
+      p_estado_id   in number
+   ) is
+   begin
+      update fide_mecanicos_tb
+         set puesto_id = p_puesto_id,
+             fecha_fin = p_fecha_fin,
+             estado_id = p_estado_id
+       where mecanico_id = p_mecanico_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el mecánico con el ID: ' || p_mecanico_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Mecánico actualizado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al actualizar mecánico: ' || sqlerrm);
+   end mecanicos_actualizar_mecanico_sp;
+
+   procedure mecanicos_archivar_mecanico_sp (
+      p_mecanico_id in number
+   ) is
+   begin
+      delete from fide_mecanicos_tb
+       where mecanico_id = p_mecanico_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el mecánico con el ID: ' || p_mecanico_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Mecánico eliminado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar mecánico: ' || sqlerrm);
+   end mecanicos_archivar_mecanico_sp;
+
+   ---------------------------------------------------------------------
+   -- REGISTRO ASISTENCIA
+   ---------------------------------------------------------------------
+
+   procedure registro_asistencia_insertar_asistencia_sp (
+      p_mecanico_id  in number,
+      p_fecha        in date,
+      p_hora_entrada in timestamp,
+      p_hora_salida  in timestamp,
+      p_estado_id    in number
+   ) is
+   begin
+      insert into fide_registro_asistencia_tb (
+         mecanico_id,
+         fecha,
+         hora_entrada,
+         hora_salida,
+         estado_id
+      ) values ( p_mecanico_id,
+                 p_fecha,
+                 p_hora_entrada,
+                 p_hora_salida,
+                 p_estado_id );
+      commit;
+      dbms_output.put_line('Registro de asistencia insertado para el mecánico ID: ' || p_mecanico_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un registro de asistencia para este mecánico en la fecha especificada.');
+      when others then
+         rollback;
+         dbms_output.put_line('Error al insertar registro de asistencia: ' || sqlerrm);
+   end registro_asistencia_insertar_asistencia_sp;
+
+   procedure registro_asistencia_actualizar_asistencia_sp (
+      p_mecanico_id in number,
+      p_fecha       in date,
+      p_hora_salida in timestamp,
+      p_estado_id   in number
+   ) is
+   begin
+      update fide_registro_asistencia_tb
+         set hora_salida = p_hora_salida,
+             estado_id = p_estado_id
+       where mecanico_id = p_mecanico_id
+         and fecha = p_fecha;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el registro de asistencia para el mecánico ID: '
+            || p_mecanico_id
+            || ' en la fecha: '
+            || p_fecha
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Registro de asistencia actualizado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al actualizar registro de asistencia: ' || sqlerrm);
+   end registro_asistencia_actualizar_asistencia_sp;
+
+   procedure registro_asistencia_archivar_asistencia_sp (
+      p_mecanico_id in number,
+      p_fecha       in date
+   ) is
+   begin
+      delete from fide_registro_asistencia_tb
+       where mecanico_id = p_mecanico_id
+         and fecha = p_fecha;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el registro de asistencia para eliminar.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Registro de asistencia eliminado correctamente.');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar registro de asistencia: ' || sqlerrm);
+   end registro_asistencia_archivar_asistencia_sp;
+
+   ---------------------------------------------------------------------
+   -- SALARIOS
+   ---------------------------------------------------------------------
+
+   procedure salarios_insertar_salario_sp (
+      p_mecanico_id   in number,
+      p_salario       in number,
+      p_fecha_inicio  in date,
+      p_fecha_fin     in date,
+      p_motivo_cambio in varchar2,
+      p_estado_id     in number
+   ) is
+      v_salario_id fide_salarios_tb.salario_id%type;
+   begin
+      select salarios_seq.nextval
+        into v_salario_id
+        from dual;
+      insert into fide_salarios_tb (
+         salario_id,
+         mecanico_id,
+         salario,
+         fecha_inicio,
+         fecha_fin,
+         motivo_cambio,
+         estado_id
+      ) values ( v_salario_id,
+                 p_mecanico_id,
+                 p_salario,
+                 p_fecha_inicio,
+                 p_fecha_fin,
+                 p_motivo_cambio,
+                 p_estado_id );
+      commit;
+      dbms_output.put_line('Salario insertado con ID: ' || v_salario_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un salario con este ID.');
+      when others then
+         rollback;
+         dbms_output.put_line('Error al insertar salario: ' || sqlerrm);
+   end salarios_insertar_salario_sp;
+
+   procedure salarios_actualizar_salario_sp (
+      p_salario_id    in number,
+      p_salario       in number,
+      p_fecha_inicio  in date,
+      p_fecha_fin     in date,
+      p_motivo_cambio in varchar2,
+      p_estado_id     in number
+   ) is
+   begin
+      update fide_salarios_tb
+         set salario = p_salario,
+             fecha_inicio = p_fecha_inicio,
+             fecha_fin = p_fecha_fin,
+             motivo_cambio = p_motivo_cambio,
+             estado_id = p_estado_id
+       where salario_id = p_salario_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el salario con el ID: ' || p_salario_id
+         );
+      end if;
+      commit;
+   end salarios_actualizar_salario_sp;
+
+   procedure salarios_archivar_salario_sp (
+      p_salario_id in number
+   ) is
+   begin
+      delete from fide_salarios_tb
+       where salario_id = p_salario_id;
+      if sql%rowcount = 0 then
+         rollback;
+         raise_application_error(
+            -20001,
+            'No se encontró el salario con el ID: ' || p_salario_id
+         );
+      end if;
+      commit;
+   end salarios_archivar_salario_sp;
+
 end fide_smartmotriz_pkg;
 /
