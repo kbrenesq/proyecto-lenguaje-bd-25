@@ -13,5 +13,3 @@
 -- Profesor: Jerson Enrique Morales Méndez
 -- Modulo: Vistas Materializadas SmartMotriz
 -- =====================================================================
-
-
