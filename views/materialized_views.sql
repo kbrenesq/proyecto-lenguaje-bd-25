@@ -1,0 +1,17 @@
+-- =====================================================================
+-- SCRIPT DDL - BASE DE DATOS SMARTMOTRIZ
+-- =====================================================================
+-- Sistema de Gestión para Taller Mecánico
+-- Universidad Fidelitas - Ingeniería en Sistemas de Computación
+-- Lenguaje de Base de Datos - III Cuatrimestre 2025
+-- 
+-- Integrantes:
+--   - Keylor Santiago Brenes Quiros
+--   - Luis Eduardo Rodríguez Calvo
+--   - Gabriel Brilla López
+--
+-- Profesor: Jerson Enrique Morales Méndez
+-- Modulo: Vistas Materializadas SmartMotriz
+-- =====================================================================
+
+
