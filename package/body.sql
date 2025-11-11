@@ -11,12 +11,12 @@
 --   - Gabriel Brilla López
 --
 -- Profesor: Jerson Enrique Morales Méndez
--- Modulo: Specificación del paquete de SmartMotriz
+-- Modulo: Body del paquete de SmartMotriz
 -- =====================================================================
 
 create or replace package body fide_smartmotriz_pkg as
 
-    ---------------------------------------------------------------------
+   ---------------------------------------------------------------------
    -- ESTADOS
    ---------------------------------------------------------------------
    procedure estados_insertar_estado_sp (
@@ -37,12 +37,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Estado insertado con ID: ' || v_estado_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un estado con este ID');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en ESTADOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en ESTADOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar un estado');
+         dbms_output.put_line('ERROR al insertar ESTADO: ' || sqlerrm);
    end estados_insertar_estado_sp;
 
    procedure estados_actualizar_estado_sp (
@@ -56,19 +59,25 @@ create or replace package body fide_smartmotriz_pkg as
        where estado_id = p_estado_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningun estado con el id: ' || p_estado_id);
          raise_application_error(
             -20001,
-            'no se encontró ningun estado con el id:  ' || p_estado_id
+            'No se encontró ningún estado con el ID: ' || p_estado_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Estado '
                            || p_estado || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en ESTADOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en ESTADOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el estado: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar ESTADO: ' || sqlerrm);
    end estados_actualizar_estado_sp;
 
    procedure estados_archivar_estado_sp (
@@ -85,18 +94,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Estado con id '
+      dbms_output.put_line('Estado con ID '
                            || p_estado_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en ESTADOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en ESTADOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el estado: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar ESTADO: ' || sqlerrm);
    end estados_archivar_estado_sp;
 
-    ---------------------------------------------------------------------
+   ---------------------------------------------------------------------
    -- USUARIOS
    ---------------------------------------------------------------------
-
    procedure usuarios_insertar_usuario_sp (
       p_cedula           in fide_usuarios_tb.cedula%type,
       p_primer_nombre    in fide_usuarios_tb.primer_nombre%type,
@@ -126,12 +140,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Usuario insertado con cédula: ' || p_cedula);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un usuario con la cédula: ' || p_cedula);
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar USUARIO: ' || sqlerrm);
    end usuarios_insertar_usuario_sp;
 
    procedure usuarios_actualizar_usuario_sp (
@@ -154,7 +171,6 @@ create or replace package body fide_smartmotriz_pkg as
        where cedula = p_cedula;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró usuario con la cédula: ' || p_cedula
@@ -164,9 +180,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Usuario actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar USUARIO: ' || sqlerrm);
    end usuarios_actualizar_usuario_sp;
 
    procedure usuarios_archivar_usuario_sp (
@@ -177,26 +199,29 @@ create or replace package body fide_smartmotriz_pkg as
        where cedula = p_cedula;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'Usuario no encontrado para eliminación.'
          );
       end if;
-
       commit;
       dbms_output.put_line('Usuario con cédula '
                            || p_cedula || ' fue eliminado.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar USUARIO: ' || sqlerrm);
    end usuarios_archivar_usuario_sp;
 
    ---------------------------------------------------------------------
    -- TIPO USUARIOS
    ---------------------------------------------------------------------
-
    procedure tipo_usuarios_insertar_tipo_sp (
       p_tipo      in fide_tipo_usuarios_tb.tipo%type,
       p_estado_id in fide_tipo_usuarios_tb.estado_id%type
@@ -218,12 +243,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de usuario insertado con ID: ' || v_tipo_usuario_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un tipo de usuario con este ID.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar tipo de usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar TIPO_USUARIO: ' || sqlerrm);
    end tipo_usuarios_insertar_tipo_sp;
 
    procedure tipo_usuarios_actualizar_tipo_sp (
@@ -238,7 +266,6 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_usuario_id = p_tipo_usuario_id;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el tipo de usuario con el ID: ' || p_tipo_usuario_id
@@ -248,9 +275,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de usuario actualizado.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar tipo de usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TIPO_USUARIO: ' || sqlerrm);
    end tipo_usuarios_actualizar_tipo_sp;
 
    procedure tipo_usuarios_archivar_tipo_sp (
@@ -261,25 +294,28 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_usuario_id = p_tipo_usuario_id;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'Tipo de usuario no encontrado.'
          );
       end if;
-
       commit;
       dbms_output.put_line('Tipo de usuario eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_USUARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_USUARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar tipo de usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TIPO_USUARIO: ' || sqlerrm);
    end tipo_usuarios_archivar_tipo_sp;
 
    ---------------------------------------------------------------------
    -- USUARIOS POR TIPO USUARIO
    ---------------------------------------------------------------------
-
    procedure usuarios_tipos_insertar_relacion_sp (
       p_cedula          in fide_usuarios_por_tipo_usuario_tb.cedula%type,
       p_tipo_usuario_id in fide_usuarios_por_tipo_usuario_tb.tipo_usuario_id%type,
@@ -297,12 +333,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Relación usuario-tipo creada correctamente.');
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('La relación ya existe para el usuario y tipo especificado.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS_POR_TIPO_USUARIO');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS_POR_TIPO_USUARIO');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar relación usuario-tipo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar relación USUARIO-TIPO: ' || sqlerrm);
    end usuarios_tipos_insertar_relacion_sp;
 
    procedure usuarios_tipos_actualizar_relacion_sp (
@@ -318,17 +357,22 @@ create or replace package body fide_smartmotriz_pkg as
       if sql%rowcount = 0 then
          raise_application_error(
             -20003,
-            'No se encontró relación usuario - tipo usuario con la cédula especificada.'
+            'No se encontró relación usuario-tipo usuario con la cédula especificada.'
          );
       end if;
       commit;
-      dbms_output.put_line('Relación usuario - tipo usuario actualizada correctamente.');
+      dbms_output.put_line('Relación usuario-tipo usuario actualizada correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS_POR_TIPO_USUARIO');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS_POR_TIPO_USUARIO');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar la relación usuario - tipo usuario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar relación USUARIO-TIPO: ' || sqlerrm);
    end usuarios_tipos_actualizar_relacion_sp;
-
 
    procedure usuarios_tipos_archivar_relacion_sp (
       p_cedula          in fide_usuarios_por_tipo_usuario_tb.cedula%type,
@@ -340,25 +384,28 @@ create or replace package body fide_smartmotriz_pkg as
          and tipo_usuario_id = p_tipo_usuario_id;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'Relación no encontrada.'
          );
       end if;
-
       commit;
       dbms_output.put_line('Relación usuario-tipo eliminada correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en USUARIOS_POR_TIPO_USUARIO');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en USUARIOS_POR_TIPO_USUARIO');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar relación: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar relación USUARIO-TIPO: ' || sqlerrm);
    end usuarios_tipos_archivar_relacion_sp;
 
    ---------------------------------------------------------------------
    -- TELÉFONOS
    ---------------------------------------------------------------------
-
    procedure telefonos_insertar_telefono_sp (
       p_cedula    in fide_telefonos_tb.cedula%type,
       p_telefono  in fide_telefonos_tb.telefono%type,
@@ -376,12 +423,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Teléfono agregado al usuario ' || p_cedula);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('El teléfono ya existe para este usuario.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TELÉFONOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TELÉFONOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar teléfono: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar TELÉFONO: ' || sqlerrm);
    end telefonos_insertar_telefono_sp;
 
    procedure telefonos_actualizar_telefono_sp (
@@ -405,11 +455,16 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Teléfono actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TELÉFONOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TELÉFONOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar el teléfono: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TELÉFONO: ' || sqlerrm);
    end telefonos_actualizar_telefono_sp;
-
 
    procedure telefonos_archivar_telefono_sp (
       p_cedula   in fide_telefonos_tb.cedula%type,
@@ -421,25 +476,28 @@ create or replace package body fide_smartmotriz_pkg as
          and telefono = p_telefono;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'Teléfono no encontrado para eliminar.'
          );
       end if;
-
       commit;
       dbms_output.put_line('Teléfono eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TELÉFONOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TELÉFONOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar teléfono: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TELÉFONO: ' || sqlerrm);
    end telefonos_archivar_telefono_sp;
 
    ---------------------------------------------------------------------
    -- CORREOS
    ---------------------------------------------------------------------
-
    procedure correos_insertar_correo_sp (
       p_cedula    in fide_correos_tb.cedula%type,
       p_correo    in fide_correos_tb.correo%type,
@@ -457,12 +515,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Correo agregado al usuario ' || p_cedula);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('El correo ya existe para este usuario.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CORREOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CORREOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar correo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar CORREO: ' || sqlerrm);
    end correos_insertar_correo_sp;
 
    procedure correos_actualizar_correo_sp (
@@ -486,11 +547,16 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Correo actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CORREOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CORREOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar el correo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar CORREO: ' || sqlerrm);
    end correos_actualizar_correo_sp;
-
 
    procedure correos_archivar_correo_sp (
       p_cedula in fide_correos_tb.cedula%type,
@@ -502,25 +568,28 @@ create or replace package body fide_smartmotriz_pkg as
          and correo = p_correo;
 
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'Correo no encontrado para eliminar.'
          );
       end if;
-
       commit;
       dbms_output.put_line('Correo eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CORREOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CORREOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar correo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar CORREO: ' || sqlerrm);
    end correos_archivar_correo_sp;
 
    ---------------------------------------------------------------------
    -- PUESTOS
    ---------------------------------------------------------------------
-
    procedure puestos_insertar_puesto_sp (
       p_puesto      in fide_puestos_tb.puesto%type,
       p_salario_min in fide_puestos_tb.salario_min%type,
@@ -532,6 +601,7 @@ create or replace package body fide_smartmotriz_pkg as
       select puestos_seq.nextval
         into v_puesto_id
         from dual;
+
       insert into fide_puestos_tb (
          puesto_id,
          puesto,
@@ -543,15 +613,19 @@ create or replace package body fide_smartmotriz_pkg as
                  p_salario_max,
                  p_salario_min,
                  p_estado_id );
+
       commit;
       dbms_output.put_line('Puesto insertado con ID: ' || v_puesto_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un puesto con este nombre.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PUESTOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PUESTOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar puesto: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar PUESTO: ' || sqlerrm);
    end puestos_insertar_puesto_sp;
 
    procedure puestos_actualizar_puesto_sp (
@@ -568,19 +642,26 @@ create or replace package body fide_smartmotriz_pkg as
              salario_min = p_salario_min,
              estado_id = p_estado_id
        where puesto_id = p_puesto_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el puesto con el ID: ' || p_puesto_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Puesto actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PUESTOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PUESTOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar puesto: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar PUESTO: ' || sqlerrm);
    end puestos_actualizar_puesto_sp;
 
    procedure puestos_archivar_puesto_sp (
@@ -589,25 +670,31 @@ create or replace package body fide_smartmotriz_pkg as
    begin
       delete from fide_puestos_tb
        where puesto_id = p_puesto_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el puesto con el ID: ' || p_puesto_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Puesto eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PUESTOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PUESTOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar puesto: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar PUESTO: ' || sqlerrm);
    end puestos_archivar_puesto_sp;
 
    ---------------------------------------------------------------------
    -- MECÁNICOS
    ---------------------------------------------------------------------
-
    procedure mecanicos_insertar_mecanico_sp (
       p_cedula        in fide_mecanicos_tb.cedula%type,
       p_puesto_id     in fide_mecanicos_tb.puesto_id%type,
@@ -620,6 +707,7 @@ create or replace package body fide_smartmotriz_pkg as
       select mecanicos_seq.nextval
         into v_mecanico_id
         from dual;
+
       insert into fide_mecanicos_tb (
          mecanico_id,
          cedula,
@@ -633,15 +721,19 @@ create or replace package body fide_smartmotriz_pkg as
                  p_fecha_ingreso,
                  p_fecha_fin,
                  p_estado_id );
+
       commit;
       dbms_output.put_line('Mecánico insertado con ID: ' || v_mecanico_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un mecánico con esta cédula.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MECÁNICOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MECÁNICOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar mecánico: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar MECÁNICO: ' || sqlerrm);
    end mecanicos_insertar_mecanico_sp;
 
    procedure mecanicos_actualizar_mecanico_sp (
@@ -656,19 +748,26 @@ create or replace package body fide_smartmotriz_pkg as
              fecha_fin = p_fecha_fin,
              estado_id = p_estado_id
        where mecanico_id = p_mecanico_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el mecánico con el ID: ' || p_mecanico_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Mecánico actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MECÁNICOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MECÁNICOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar mecánico: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar MECÁNICO: ' || sqlerrm);
    end mecanicos_actualizar_mecanico_sp;
 
    procedure mecanicos_archivar_mecanico_sp (
@@ -677,25 +776,31 @@ create or replace package body fide_smartmotriz_pkg as
    begin
       delete from fide_mecanicos_tb
        where mecanico_id = p_mecanico_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el mecánico con el ID: ' || p_mecanico_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Mecánico eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MECÁNICOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MECÁNICOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar mecánico: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar MECÁNICO: ' || sqlerrm);
    end mecanicos_archivar_mecanico_sp;
 
    ---------------------------------------------------------------------
    -- REGISTRO ASISTENCIA
    ---------------------------------------------------------------------
-
    procedure registro_asistencia_insertar_asistencia_sp (
       p_mecanico_id  in fide_registro_asistencia_tb.mecanico_id%type,
       p_fecha        in fide_registro_asistencia_tb.fecha%type,
@@ -715,15 +820,19 @@ create or replace package body fide_smartmotriz_pkg as
                  p_hora_entrada,
                  p_hora_salida,
                  p_estado_id );
+
       commit;
       dbms_output.put_line('Registro de asistencia insertado para el mecánico ID: ' || p_mecanico_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un registro de asistencia para este mecánico en la fecha especificada.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en REGISTRO_ASISTENCIA');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en REGISTRO_ASISTENCIA');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar registro de asistencia: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar REGISTRO_ASISTENCIA: ' || sqlerrm);
    end registro_asistencia_insertar_asistencia_sp;
 
    procedure registro_asistencia_actualizar_asistencia_sp (
@@ -738,8 +847,8 @@ create or replace package body fide_smartmotriz_pkg as
              estado_id = p_estado_id
        where mecanico_id = p_mecanico_id
          and fecha = p_fecha;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el registro de asistencia para el mecánico ID: '
@@ -748,12 +857,19 @@ create or replace package body fide_smartmotriz_pkg as
             || p_fecha
          );
       end if;
+
       commit;
       dbms_output.put_line('Registro de asistencia actualizado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en REGISTRO_ASISTENCIA');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en REGISTRO_ASISTENCIA');
       when others then
          rollback;
-         dbms_output.put_line('Error al actualizar registro de asistencia: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar REGISTRO_ASISTENCIA: ' || sqlerrm);
    end registro_asistencia_actualizar_asistencia_sp;
 
    procedure registro_asistencia_archivar_asistencia_sp (
@@ -764,8 +880,8 @@ create or replace package body fide_smartmotriz_pkg as
       delete from fide_registro_asistencia_tb
        where mecanico_id = p_mecanico_id
          and fecha = p_fecha;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el registro de asistencia para eliminar.'
@@ -774,15 +890,20 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Registro de asistencia eliminado correctamente.');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en REGISTRO_ASISTENCIA');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en REGISTRO_ASISTENCIA');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar registro de asistencia: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar REGISTRO_ASISTENCIA: ' || sqlerrm);
    end registro_asistencia_archivar_asistencia_sp;
 
    ---------------------------------------------------------------------
    -- SALARIOS
    ---------------------------------------------------------------------
-
    procedure salarios_insertar_salario_sp (
       p_mecanico_id   in fide_salarios_tb.mecanico_id%type,
       p_salario       in fide_salarios_tb.salario%type,
@@ -796,6 +917,7 @@ create or replace package body fide_smartmotriz_pkg as
       select salarios_seq.nextval
         into v_salario_id
         from dual;
+
       insert into fide_salarios_tb (
          salario_id,
          mecanico_id,
@@ -811,15 +933,19 @@ create or replace package body fide_smartmotriz_pkg as
                  p_fecha_fin,
                  p_motivo_cambio,
                  p_estado_id );
+
       commit;
       dbms_output.put_line('Salario insertado con ID: ' || v_salario_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un salario con este ID.');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en SALARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en SALARIOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al insertar salario: ' || sqlerrm);
+         dbms_output.put_line('ERROR al insertar SALARIO: ' || sqlerrm);
    end salarios_insertar_salario_sp;
 
    procedure salarios_actualizar_salario_sp (
@@ -838,14 +964,26 @@ create or replace package body fide_smartmotriz_pkg as
              motivo_cambio = p_motivo_cambio,
              estado_id = p_estado_id
        where salario_id = p_salario_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el salario con el ID: ' || p_salario_id
          );
       end if;
+
       commit;
+      dbms_output.put_line('Salario actualizado correctamente.');
+   exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en SALARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en SALARIOS');
+      when others then
+         rollback;
+         dbms_output.put_line('ERROR al actualizar SALARIO: ' || sqlerrm);
    end salarios_actualizar_salario_sp;
 
    procedure salarios_archivar_salario_sp (
@@ -854,21 +992,31 @@ create or replace package body fide_smartmotriz_pkg as
    begin
       delete from fide_salarios_tb
        where salario_id = p_salario_id;
+
       if sql%rowcount = 0 then
-         rollback;
          raise_application_error(
             -20001,
             'No se encontró el salario con el ID: ' || p_salario_id
          );
       end if;
+
       commit;
+      dbms_output.put_line('Salario eliminado correctamente.');
+   exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en SALARIOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en SALARIOS');
+      when others then
+         rollback;
+         dbms_output.put_line('ERROR al eliminar SALARIO: ' || sqlerrm);
    end salarios_archivar_salario_sp;
 
-
    ---------------------------------------------------------------------
-    -- TIPO DIRECCIONES
-    ---------------------------------------------------------------------
-
+   -- TIPO DIRECCIONES
+   ---------------------------------------------------------------------
    procedure tipo_direcciones_insertar_tipo_sp (
       p_tipo      in fide_tipo_direcciones_tb.tipo%type,
       p_estado_id in fide_tipo_direcciones_tb.estado_id%type
@@ -890,12 +1038,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de dirección insertado con ID: ' || v_tipo_direccion_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un tipo de dirección con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el tipo de dirección');
+         dbms_output.put_line('ERROR al insertar TIPO_DIRECCIÓN: ' || sqlerrm);
    end tipo_direcciones_insertar_tipo_sp;
 
    procedure tipo_direcciones_actualizar_tipo_sp (
@@ -910,19 +1061,25 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_direccion_id = p_tipo_direccion_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún tipo de dirección con el id: ' || p_tipo_direccion_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún tipo de dirección con el id: ' || p_tipo_direccion_id
+            'No se encontró ningún tipo de dirección con el ID: ' || p_tipo_direccion_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Tipo de dirección '
                            || p_tipo || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el tipo de dirección: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TIPO_DIRECCIÓN: ' || sqlerrm);
    end tipo_direcciones_actualizar_tipo_sp;
 
    procedure tipo_direcciones_archivar_tipo_sp (
@@ -939,18 +1096,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Tipo de dirección con id '
+      dbms_output.put_line('Tipo de dirección con ID '
                            || p_tipo_direccion_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el tipo de dirección: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TIPO_DIRECCIÓN: ' || sqlerrm);
    end tipo_direcciones_archivar_tipo_sp;
 
-    ---------------------------------------------------------------------
-    -- PROVINCIAS
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- PROVINCIAS
+   ---------------------------------------------------------------------
    procedure provincias_insertar_provincia_sp (
       p_provincia in fide_provincias_tb.provincia%type,
       p_estado_id in fide_provincias_tb.estado_id%type
@@ -972,12 +1134,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Provincia insertada con ID: ' || v_provincia_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una provincia con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PROVINCIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PROVINCIAS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la provincia');
+         dbms_output.put_line('ERROR al insertar PROVINCIA: ' || sqlerrm);
    end provincias_insertar_provincia_sp;
 
    procedure provincias_actualizar_provincia_sp (
@@ -992,19 +1157,25 @@ create or replace package body fide_smartmotriz_pkg as
        where provincia_id = p_provincia_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna provincia con el id: ' || p_provincia_id);
          raise_application_error(
             -20001,
-            'No se encontró ninguna provincia con el id: ' || p_provincia_id
+            'No se encontró ninguna provincia con el ID: ' || p_provincia_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Provincia '
                            || p_provincia || ' actualizada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PROVINCIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PROVINCIAS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la provincia: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar PROVINCIA: ' || sqlerrm);
    end provincias_actualizar_provincia_sp;
 
    procedure provincias_archivar_provincia_sp (
@@ -1021,18 +1192,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Provincia con id '
+      dbms_output.put_line('Provincia con ID '
                            || p_provincia_id || ' fue eliminada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en PROVINCIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en PROVINCIAS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la provincia: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar PROVINCIA: ' || sqlerrm);
    end provincias_archivar_provincia_sp;
 
-    ---------------------------------------------------------------------
-    -- CANTONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- CANTONES
+   ---------------------------------------------------------------------
    procedure cantones_insertar_canton_sp (
       p_canton       in fide_cantones_tb.canton%type,
       p_provincia_id in fide_cantones_tb.provincia_id%type,
@@ -1057,12 +1233,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Cantón insertado con ID: ' || v_canton_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un cantón con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CANTONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CANTONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el cantón');
+         dbms_output.put_line('ERROR al insertar CANTÓN: ' || sqlerrm);
    end cantones_insertar_canton_sp;
 
    procedure cantones_actualizar_canton_sp (
@@ -1079,19 +1258,25 @@ create or replace package body fide_smartmotriz_pkg as
        where canton_id = p_canton_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún cantón con el id: ' || p_canton_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún cantón con el id: ' || p_canton_id
+            'No se encontró ningún cantón con el ID: ' || p_canton_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Cantón '
                            || p_canton || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CANTONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CANTONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el cantón: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar CANTÓN: ' || sqlerrm);
    end cantones_actualizar_canton_sp;
 
    procedure cantones_archivar_canton_sp (
@@ -1108,18 +1293,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Cantón con id '
+      dbms_output.put_line('Cantón con ID '
                            || p_canton_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en CANTONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en CANTONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el cantón: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar CANTÓN: ' || sqlerrm);
    end cantones_archivar_canton_sp;
 
-    ---------------------------------------------------------------------
-    -- DISTRITOS
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- DISTRITOS
+   ---------------------------------------------------------------------
    procedure distritos_insertar_distrito_sp (
       p_distrito  in fide_distritos_tb.distrito%type,
       p_canton_id in fide_distritos_tb.canton_id%type,
@@ -1144,12 +1334,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Distrito insertado con ID: ' || v_distrito_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un distrito con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DISTRITOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DISTRITOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el distrito');
+         dbms_output.put_line('ERROR al insertar DISTRITO: ' || sqlerrm);
    end distritos_insertar_distrito_sp;
 
    procedure distritos_actualizar_distrito_sp (
@@ -1166,19 +1359,25 @@ create or replace package body fide_smartmotriz_pkg as
        where distrito_id = p_distrito_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún distrito con el id: ' || p_distrito_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún distrito con el id: ' || p_distrito_id
+            'No se encontró ningún distrito con el ID: ' || p_distrito_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Distrito '
                            || p_distrito || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DISTRITOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DISTRITOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el distrito: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar DISTRITO: ' || sqlerrm);
    end distritos_actualizar_distrito_sp;
 
    procedure distritos_archivar_distrito_sp (
@@ -1195,18 +1394,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Distrito con id '
+      dbms_output.put_line('Distrito con ID '
                            || p_distrito_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DISTRITOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DISTRITOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el distrito: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar DISTRITO: ' || sqlerrm);
    end distritos_archivar_distrito_sp;
 
-    ---------------------------------------------------------------------
-    -- DIRECCIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- DIRECCIONES
+   ---------------------------------------------------------------------
    procedure direcciones_insertar_direccion_sp (
       p_cedula            in fide_direcciones_tb.cedula%type,
       p_tipo_direccion_id in fide_direcciones_tb.tipo_direccion_id%type,
@@ -1230,12 +1434,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Dirección insertada para el usuario: ' || p_cedula);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una dirección de este tipo para el usuario');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la dirección');
+         dbms_output.put_line('ERROR al insertar DIRECCIÓN: ' || sqlerrm);
    end direcciones_insertar_direccion_sp;
 
    procedure direcciones_actualizar_direccion_sp (
@@ -1254,18 +1461,24 @@ create or replace package body fide_smartmotriz_pkg as
          and tipo_direccion_id = p_tipo_direccion_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna dirección para el usuario: ' || p_cedula);
          raise_application_error(
             -20001,
             'No se encontró ninguna dirección para el usuario: ' || p_cedula
          );
       end if;
+
       commit;
       dbms_output.put_line('Dirección actualizada para el usuario: ' || p_cedula);
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la dirección: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar DIRECCIÓN: ' || sqlerrm);
    end direcciones_actualizar_direccion_sp;
 
    procedure direcciones_archivar_direccion_sp (
@@ -1286,15 +1499,20 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Dirección eliminada para el usuario: ' || p_cedula);
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en DIRECCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en DIRECCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la dirección: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar DIRECCIÓN: ' || sqlerrm);
    end direcciones_archivar_direccion_sp;
 
    ---------------------------------------------------------------------
-    -- TIPO CARROCERIAS
-    ---------------------------------------------------------------------
-
+   -- TIPO CARROCERIAS
+   ---------------------------------------------------------------------
    procedure tipo_carrocerias_insertar_tipo_sp (
       p_nombre    in fide_tipo_carrocerias_tb.nombre%type,
       p_estado_id in fide_tipo_carrocerias_tb.estado_id%type
@@ -1316,12 +1534,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de carrocería insertado con ID: ' || v_tipo_carroceria_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un tipo de carrocería con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_CARROCERIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_CARROCERIAS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el tipo de carrocería');
+         dbms_output.put_line('ERROR al insertar TIPO_CARROCERÍA: ' || sqlerrm);
    end tipo_carrocerias_insertar_tipo_sp;
 
    procedure tipo_carrocerias_actualizar_tipo_sp (
@@ -1336,19 +1557,25 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_carroceria_id = p_tipo_carroceria_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún tipo de carrocería con el id: ' || p_tipo_carroceria_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún tipo de carrocería con el id: ' || p_tipo_carroceria_id
+            'No se encontró ningún tipo de carrocería con el ID: ' || p_tipo_carroceria_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Tipo de carrocería '
                            || p_nombre || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_CARROCERIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_CARROCERIAS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el tipo de carrocería: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TIPO_CARROCERÍA: ' || sqlerrm);
    end tipo_carrocerias_actualizar_tipo_sp;
 
    procedure tipo_carrocerias_archivar_tipo_sp (
@@ -1365,18 +1592,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Tipo de carrocería con id '
+      dbms_output.put_line('Tipo de carrocería con ID '
                            || p_tipo_carroceria_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_CARROCERIAS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_CARROCERIAS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el tipo de carrocería: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TIPO_CARROCERÍA: ' || sqlerrm);
    end tipo_carrocerias_archivar_tipo_sp;
 
-    ---------------------------------------------------------------------
-    -- TIPO COMBUSTIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- TIPO COMBUSTIONES
+   ---------------------------------------------------------------------
    procedure tipo_combustiones_insertar_tipo_sp (
       p_nombre    in fide_tipo_combustiones_tb.nombre%type,
       p_estado_id in fide_tipo_combustiones_tb.estado_id%type
@@ -1398,12 +1630,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de combustión insertado con ID: ' || v_tipo_combustion_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un tipo de combustión con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_COMBUSTIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_COMBUSTIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el tipo de combustión');
+         dbms_output.put_line('ERROR al insertar TIPO_COMBUSTIÓN: ' || sqlerrm);
    end tipo_combustiones_insertar_tipo_sp;
 
    procedure tipo_combustiones_actualizar_tipo_sp (
@@ -1418,19 +1653,25 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_combustion_id = p_tipo_combustion_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún tipo de combustión con el id: ' || p_tipo_combustion_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún tipo de combustión con el id: ' || p_tipo_combustion_id
+            'No se encontró ningún tipo de combustión con el ID: ' || p_tipo_combustion_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Tipo de combustión '
                            || p_nombre || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_COMBUSTIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_COMBUSTIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el tipo de combustión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TIPO_COMBUSTIÓN: ' || sqlerrm);
    end tipo_combustiones_actualizar_tipo_sp;
 
    procedure tipo_combustiones_archivar_tipo_sp (
@@ -1447,18 +1688,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Tipo de combustión con id '
+      dbms_output.put_line('Tipo de combustión con ID '
                            || p_tipo_combustion_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_COMBUSTIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_COMBUSTIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el tipo de combustión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TIPO_COMBUSTIÓN: ' || sqlerrm);
    end tipo_combustiones_archivar_tipo_sp;
 
-    ---------------------------------------------------------------------
-    -- TIPO TRANSMISIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- TIPO TRANSMISIONES
+   ---------------------------------------------------------------------
    procedure tipo_transmisiones_insertar_tipo_sp (
       p_nombre    in fide_tipo_transmisiones_tb.nombre%type,
       p_estado_id in fide_tipo_transmisiones_tb.estado_id%type
@@ -1480,12 +1726,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tipo de transmisión insertado con ID: ' || v_tipo_transmision_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un tipo de transmisión con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el tipo de transmisión');
+         dbms_output.put_line('ERROR al insertar TIPO_TRANSMISIÓN: ' || sqlerrm);
    end tipo_transmisiones_insertar_tipo_sp;
 
    procedure tipo_transmisiones_actualizar_tipo_sp (
@@ -1500,19 +1749,25 @@ create or replace package body fide_smartmotriz_pkg as
        where tipo_transmision_id = p_tipo_transmision_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún tipo de transmisión con el id: ' || p_tipo_transmision_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún tipo de transmisión con el id: ' || p_tipo_transmision_id
+            'No se encontró ningún tipo de transmisión con el ID: ' || p_tipo_transmision_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Tipo de transmisión '
                            || p_nombre || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el tipo de transmisión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TIPO_TRANSMISIÓN: ' || sqlerrm);
    end tipo_transmisiones_actualizar_tipo_sp;
 
    procedure tipo_transmisiones_archivar_tipo_sp (
@@ -1529,18 +1784,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Tipo de transmisión con id '
+      dbms_output.put_line('Tipo de transmisión con ID '
                            || p_tipo_transmision_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TIPO_TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TIPO_TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el tipo de transmisión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TIPO_TRANSMISIÓN: ' || sqlerrm);
    end tipo_transmisiones_archivar_tipo_sp;
 
-    ---------------------------------------------------------------------
-    -- TRACCIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- TRACCIONES
+   ---------------------------------------------------------------------
    procedure tracciones_insertar_traccion_sp (
       p_nombre    in fide_tracciones_tb.nombre%type,
       p_estado_id in fide_tracciones_tb.estado_id%type
@@ -1562,12 +1822,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Tracción insertada con ID: ' || v_traccion_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una tracción con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRACCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRACCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la tracción');
+         dbms_output.put_line('ERROR al insertar TRACCIÓN: ' || sqlerrm);
    end tracciones_insertar_traccion_sp;
 
    procedure tracciones_actualizar_traccion_sp (
@@ -1582,19 +1845,25 @@ create or replace package body fide_smartmotriz_pkg as
        where traccion_id = p_traccion_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna tracción con el id: ' || p_traccion_id);
          raise_application_error(
             -20001,
-            'No se encontró ninguna tracción con el id: ' || p_traccion_id
+            'No se encontró ninguna tracción con el ID: ' || p_traccion_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Tracción '
                            || p_nombre || ' actualizada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRACCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRACCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la tracción: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TRACCIÓN: ' || sqlerrm);
    end tracciones_actualizar_traccion_sp;
 
    procedure tracciones_archivar_traccion_sp (
@@ -1611,18 +1880,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Tracción con id '
+      dbms_output.put_line('Tracción con ID '
                            || p_traccion_id || ' fue eliminada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRACCIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRACCIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la tracción: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TRACCIÓN: ' || sqlerrm);
    end tracciones_archivar_traccion_sp;
 
-    ---------------------------------------------------------------------
-    -- MARCAS VEHICULOS
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- MARCAS VEHICULOS
+   ---------------------------------------------------------------------
    procedure marcas_vehiculos_insertar_marca_sp (
       p_marca     in fide_marcas_vehiculos_tb.marca%type,
       p_estado_id in fide_marcas_vehiculos_tb.estado_id%type
@@ -1644,12 +1918,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Marca de vehículo insertada con ID: ' || v_marca_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una marca con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MARCAS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MARCAS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la marca');
+         dbms_output.put_line('ERROR al insertar MARCA_VEHÍCULO: ' || sqlerrm);
    end marcas_vehiculos_insertar_marca_sp;
 
    procedure marcas_vehiculos_actualizar_marca_sp (
@@ -1664,19 +1941,25 @@ create or replace package body fide_smartmotriz_pkg as
        where marca_id = p_marca_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna marca con el id: ' || p_marca_id);
          raise_application_error(
             -20001,
-            'No se encontró ninguna marca con el id: ' || p_marca_id
+            'No se encontró ninguna marca con el ID: ' || p_marca_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Marca '
                            || p_marca || ' actualizada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MARCAS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MARCAS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la marca: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar MARCA_VEHÍCULO: ' || sqlerrm);
    end marcas_vehiculos_actualizar_marca_sp;
 
    procedure marcas_vehiculos_archivar_marca_sp (
@@ -1693,18 +1976,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Marca con id '
+      dbms_output.put_line('Marca con ID '
                            || p_marca_id || ' fue eliminada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MARCAS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MARCAS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la marca: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar MARCA_VEHÍCULO: ' || sqlerrm);
    end marcas_vehiculos_archivar_marca_sp;
 
-    ---------------------------------------------------------------------
-    -- MODELOS VEHICULOS
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- MODELOS VEHICULOS
+   ---------------------------------------------------------------------
    procedure modelos_vehiculos_insertar_modelo_sp (
       p_marca_id           in fide_modelos_vehiculos_tb.marca_id%type,
       p_tipo_carroceria_id in fide_modelos_vehiculos_tb.tipo_carroceria_id%type,
@@ -1732,12 +2020,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Modelo de vehículo insertado con ID: ' || v_modelo_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un modelo con este nombre');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el modelo');
+         dbms_output.put_line('ERROR al insertar MODELO_VEHÍCULO: ' || sqlerrm);
    end modelos_vehiculos_insertar_modelo_sp;
 
    procedure modelos_vehiculos_actualizar_modelo_sp (
@@ -1756,19 +2047,25 @@ create or replace package body fide_smartmotriz_pkg as
        where modelo_id = p_modelo_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún modelo con el id: ' || p_modelo_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún modelo con el id: ' || p_modelo_id
+            'No se encontró ningún modelo con el ID: ' || p_modelo_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Modelo '
                            || p_modelo || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el modelo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar MODELO_VEHÍCULO: ' || sqlerrm);
    end modelos_vehiculos_actualizar_modelo_sp;
 
    procedure modelos_vehiculos_archivar_modelo_sp (
@@ -1785,18 +2082,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Modelo con id '
+      dbms_output.put_line('Modelo con ID '
                            || p_modelo_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el modelo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar MODELO_VEHÍCULO: ' || sqlerrm);
    end modelos_vehiculos_archivar_modelo_sp;
 
-    ---------------------------------------------------------------------
-    -- MOTORES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- MOTORES
+   ---------------------------------------------------------------------
    procedure motores_insertar_motor_sp (
       p_tipo_combustion_id in fide_motores_tb.tipo_combustion_id%type,
       p_nombre             in fide_motores_tb.nombre%type,
@@ -1830,12 +2132,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Motor insertado con ID: ' || v_motor_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un motor con este ID');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MOTORES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MOTORES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el motor');
+         dbms_output.put_line('ERROR al insertar MOTOR: ' || sqlerrm);
    end motores_insertar_motor_sp;
 
    procedure motores_actualizar_motor_sp (
@@ -1858,19 +2163,25 @@ create or replace package body fide_smartmotriz_pkg as
        where motor_id = p_motor_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún motor con el id: ' || p_motor_id);
          raise_application_error(
             -20001,
-            'No se encontró ningún motor con el id: ' || p_motor_id
+            'No se encontró ningún motor con el ID: ' || p_motor_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Motor '
                            || p_nombre || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MOTORES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MOTORES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el motor: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar MOTOR: ' || sqlerrm);
    end motores_actualizar_motor_sp;
 
    procedure motores_archivar_motor_sp (
@@ -1887,18 +2198,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Motor con id '
+      dbms_output.put_line('Motor con ID '
                            || p_motor_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MOTORES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MOTORES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el motor: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar MOTOR: ' || sqlerrm);
    end motores_archivar_motor_sp;
 
-    ---------------------------------------------------------------------
-    -- TRANSMISIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- TRANSMISIONES
+   ---------------------------------------------------------------------
    procedure transmisiones_insertar_transmision_sp (
       p_tipo_transmision_id in fide_transmisiones_tb.tipo_transmision_id%type,
       p_tipo_traccion_id    in fide_transmisiones_tb.tipo_traccion_id%type,
@@ -1929,12 +2245,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Transmisión insertada con ID: ' || v_transmision_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una transmisión con este ID');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la transmisión');
+         dbms_output.put_line('ERROR al insertar TRANSMISIÓN: ' || sqlerrm);
    end transmisiones_insertar_transmision_sp;
 
    procedure transmisiones_actualizar_transmision_sp (
@@ -1955,19 +2274,25 @@ create or replace package body fide_smartmotriz_pkg as
        where transmision_id = p_transmision_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna transmisión con el id: ' || p_transmision_id);
          raise_application_error(
             -20001,
-            'No se encontró ninguna transmisión con el id: ' || p_transmision_id
+            'No se encontró ninguna transmisión con el ID: ' || p_transmision_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Transmisión '
                            || p_nombre || ' actualizada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la transmisión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar TRANSMISIÓN: ' || sqlerrm);
    end transmisiones_actualizar_transmision_sp;
 
    procedure transmisiones_archivar_transmision_sp (
@@ -1984,18 +2309,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Transmisión con id '
+      dbms_output.put_line('Transmisión con ID '
                            || p_transmision_id || ' fue eliminada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en TRANSMISIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en TRANSMISIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la transmisión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar TRANSMISIÓN: ' || sqlerrm);
    end transmisiones_archivar_transmision_sp;
 
-    ---------------------------------------------------------------------
-    -- MODELOS VERSIONES
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- MODELOS VERSIONES
+   ---------------------------------------------------------------------
    procedure modelos_versiones_insertar_version_sp (
       p_modelo_id      in fide_modelos_versiones_tb.modelo_id%type,
       p_motor_id       in fide_modelos_versiones_tb.motor_id%type,
@@ -2029,12 +2359,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Versión de modelo insertada con ID: ' || v_modelo_version_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe una versión con este ID');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VERSIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VERSIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar la versión del modelo');
+         dbms_output.put_line('ERROR al insertar VERSIÓN_MODELO: ' || sqlerrm);
    end modelos_versiones_insertar_version_sp;
 
    procedure modelos_versiones_actualizar_version_sp (
@@ -2057,19 +2390,25 @@ create or replace package body fide_smartmotriz_pkg as
        where modelo_version_id = p_modelo_version_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ninguna versión con el id: ' || p_modelo_version_id);
          raise_application_error(
             -20001,
-            'No se encontró ninguna versión con el id: ' || p_modelo_version_id
+            'No se encontró ninguna versión con el ID: ' || p_modelo_version_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Versión '
                            || p_nombre || ' actualizada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VERSIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VERSIONES');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar la versión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar VERSIÓN_MODELO: ' || sqlerrm);
    end modelos_versiones_actualizar_version_sp;
 
    procedure modelos_versiones_archivar_version_sp (
@@ -2086,18 +2425,23 @@ create or replace package body fide_smartmotriz_pkg as
          );
       end if;
       commit;
-      dbms_output.put_line('Versión con id '
+      dbms_output.put_line('Versión con ID '
                            || p_modelo_version_id || ' fue eliminada');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en MODELOS_VERSIONES');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en MODELOS_VERSIONES');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar la versión: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar VERSIÓN_MODELO: ' || sqlerrm);
    end modelos_versiones_archivar_version_sp;
 
-    ---------------------------------------------------------------------
-    -- VEHICULOS
-    ---------------------------------------------------------------------
-
+   ---------------------------------------------------------------------
+   -- VEHICULOS
+   ---------------------------------------------------------------------
    procedure vehiculos_insertar_vehiculo_sp (
       p_placa_id          in fide_vehiculos_tb.placa_id%type,
       p_cedula            in fide_vehiculos_tb.cedula%type,
@@ -2127,12 +2471,15 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
       dbms_output.put_line('Vehículo insertado con placa: ' || p_placa_id);
    exception
-      when dup_val_on_index then
+      when no_data_found then
          rollback;
-         dbms_output.put_line('Ya existe un vehículo con esta placa');
+         dbms_output.put_line('DATOS NO ENCONTRADOS en VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al insertar el vehículo');
+         dbms_output.put_line('ERROR al insertar VEHÍCULO: ' || sqlerrm);
    end vehiculos_insertar_vehiculo_sp;
 
    procedure vehiculos_actualizar_vehiculo_sp (
@@ -2153,19 +2500,25 @@ create or replace package body fide_smartmotriz_pkg as
        where placa_id = p_placa_id;
 
       if sql%rowcount = 0 then
-         dbms_output.put_line('No se encontró ningún vehículo con la placa: ' || p_placa_id);
          raise_application_error(
             -20001,
             'No se encontró ningún vehículo con la placa: ' || p_placa_id
          );
       end if;
+
       commit;
       dbms_output.put_line('Vehículo con placa '
                            || p_placa_id || ' actualizado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Hubo un error al actualizar el vehículo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al actualizar VEHÍCULO: ' || sqlerrm);
    end vehiculos_actualizar_vehiculo_sp;
 
    procedure vehiculos_archivar_vehiculo_sp (
@@ -2185,8 +2538,16 @@ create or replace package body fide_smartmotriz_pkg as
       dbms_output.put_line('Vehículo con placa '
                            || p_placa_id || ' fue eliminado');
    exception
+      when no_data_found then
+         rollback;
+         dbms_output.put_line('DATOS NO ENCONTRADOS en VEHICULOS');
+      when too_many_rows then
+         rollback;
+         dbms_output.put_line('DATOS DUPLICADOS en VEHICULOS');
       when others then
          rollback;
-         dbms_output.put_line('Error al eliminar el vehículo: ' || sqlerrm);
+         dbms_output.put_line('ERROR al eliminar VEHÍCULO: ' || sqlerrm);
    end vehiculos_archivar_vehiculo_sp;
+
 end fide_smartmotriz_pkg;
+/
