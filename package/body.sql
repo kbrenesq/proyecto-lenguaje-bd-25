@@ -1303,6 +1303,906 @@ create or replace package body fide_smartmotriz_pkg as
          dbms_output.put_line('Error al eliminar la dirección: ' || sqlerrm);
    end direcciones_archivar_direccion_sp;
 
+   ---------------------------------------------------------------------
+    -- TIPO CARROCERIAS
+    ---------------------------------------------------------------------
+
+   procedure tipo_carrocerias_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   ) is
+      v_tipo_carroceria_id fide_tipo_carrocerias_tb.tipo_carroceria_id%type;
+   begin
+      select tipo_carrocerias_seq.nextval
+        into v_tipo_carroceria_id
+        from dual;
+
+      insert into fide_tipo_carrocerias_tb (
+         tipo_carroceria_id,
+         nombre,
+         estado_id
+      ) values ( v_tipo_carroceria_id,
+                 p_nombre,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Tipo de carrocería insertado con ID: ' || v_tipo_carroceria_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un tipo de carrocería con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el tipo de carrocería');
+   end tipo_carrocerias_insertar_tipo_sp;
+
+   procedure tipo_carrocerias_actualizar_tipo_sp (
+      p_tipo_carroceria_id in number,
+      p_nombre             in varchar2,
+      p_estado_id          in number
+   ) is
+   begin
+      update fide_tipo_carrocerias_tb
+         set nombre = p_nombre,
+             estado_id = p_estado_id
+       where tipo_carroceria_id = p_tipo_carroceria_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún tipo de carrocería con el id: ' || p_tipo_carroceria_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún tipo de carrocería con el id: ' || p_tipo_carroceria_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de carrocería '
+                           || p_nombre || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el tipo de carrocería: ' || sqlerrm);
+   end tipo_carrocerias_actualizar_tipo_sp;
+
+   procedure tipo_carrocerias_archivar_tipo_sp (
+      p_tipo_carroceria_id in number
+   ) is
+   begin
+      delete from fide_tipo_carrocerias_tb
+       where tipo_carroceria_id = p_tipo_carroceria_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Tipo de carrocería no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de carrocería con id '
+                           || p_tipo_carroceria_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el tipo de carrocería: ' || sqlerrm);
+   end tipo_carrocerias_archivar_tipo_sp;
+
+    ---------------------------------------------------------------------
+    -- TIPO COMBUSTIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_combustiones_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   ) is
+      v_tipo_combustion_id fide_tipo_combustiones_tb.tipo_combustion_id%type;
+   begin
+      select tipo_combustiones_seq.nextval
+        into v_tipo_combustion_id
+        from dual;
+
+      insert into fide_tipo_combustiones_tb (
+         tipo_combustion_id,
+         nombre,
+         estado_id
+      ) values ( v_tipo_combustion_id,
+                 p_nombre,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Tipo de combustión insertado con ID: ' || v_tipo_combustion_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un tipo de combustión con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el tipo de combustión');
+   end tipo_combustiones_insertar_tipo_sp;
+
+   procedure tipo_combustiones_actualizar_tipo_sp (
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_estado_id          in number
+   ) is
+   begin
+      update fide_tipo_combustiones_tb
+         set nombre = p_nombre,
+             estado_id = p_estado_id
+       where tipo_combustion_id = p_tipo_combustion_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún tipo de combustión con el id: ' || p_tipo_combustion_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún tipo de combustión con el id: ' || p_tipo_combustion_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de combustión '
+                           || p_nombre || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el tipo de combustión: ' || sqlerrm);
+   end tipo_combustiones_actualizar_tipo_sp;
+
+   procedure tipo_combustiones_archivar_tipo_sp (
+      p_tipo_combustion_id in number
+   ) is
+   begin
+      delete from fide_tipo_combustiones_tb
+       where tipo_combustion_id = p_tipo_combustion_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Tipo de combustión no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de combustión con id '
+                           || p_tipo_combustion_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el tipo de combustión: ' || sqlerrm);
+   end tipo_combustiones_archivar_tipo_sp;
+
+    ---------------------------------------------------------------------
+    -- TIPO TRANSMISIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_transmisiones_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   ) is
+      v_tipo_transmision_id fide_tipo_transmisiones_tb.tipo_transmision_id%type;
+   begin
+      select tipo_transmisiones_seq.nextval
+        into v_tipo_transmision_id
+        from dual;
+
+      insert into fide_tipo_transmisiones_tb (
+         tipo_transmision_id,
+         nombre,
+         estado_id
+      ) values ( v_tipo_transmision_id,
+                 p_nombre,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Tipo de transmisión insertado con ID: ' || v_tipo_transmision_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un tipo de transmisión con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el tipo de transmisión');
+   end tipo_transmisiones_insertar_tipo_sp;
+
+   procedure tipo_transmisiones_actualizar_tipo_sp (
+      p_tipo_transmision_id in number,
+      p_nombre              in varchar2,
+      p_estado_id           in number
+   ) is
+   begin
+      update fide_tipo_transmisiones_tb
+         set nombre = p_nombre,
+             estado_id = p_estado_id
+       where tipo_transmision_id = p_tipo_transmision_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún tipo de transmisión con el id: ' || p_tipo_transmision_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún tipo de transmisión con el id: ' || p_tipo_transmision_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de transmisión '
+                           || p_nombre || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el tipo de transmisión: ' || sqlerrm);
+   end tipo_transmisiones_actualizar_tipo_sp;
+
+   procedure tipo_transmisiones_archivar_tipo_sp (
+      p_tipo_transmision_id in number
+   ) is
+   begin
+      delete from fide_tipo_transmisiones_tb
+       where tipo_transmision_id = p_tipo_transmision_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Tipo de transmisión no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de transmisión con id '
+                           || p_tipo_transmision_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el tipo de transmisión: ' || sqlerrm);
+   end tipo_transmisiones_archivar_tipo_sp;
+
+    ---------------------------------------------------------------------
+    -- TRACCIONES
+    ---------------------------------------------------------------------
+
+   procedure tracciones_insertar_traccion_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   ) is
+      v_traccion_id fide_tracciones_tb.traccion_id%type;
+   begin
+      select tracciones_seq.nextval
+        into v_traccion_id
+        from dual;
+
+      insert into fide_tracciones_tb (
+         traccion_id,
+         nombre,
+         estado_id
+      ) values ( v_traccion_id,
+                 p_nombre,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Tracción insertada con ID: ' || v_traccion_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una tracción con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la tracción');
+   end tracciones_insertar_traccion_sp;
+
+   procedure tracciones_actualizar_traccion_sp (
+      p_traccion_id in number,
+      p_nombre      in varchar2,
+      p_estado_id   in number
+   ) is
+   begin
+      update fide_tracciones_tb
+         set nombre = p_nombre,
+             estado_id = p_estado_id
+       where traccion_id = p_traccion_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna tracción con el id: ' || p_traccion_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna tracción con el id: ' || p_traccion_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tracción '
+                           || p_nombre || ' actualizada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la tracción: ' || sqlerrm);
+   end tracciones_actualizar_traccion_sp;
+
+   procedure tracciones_archivar_traccion_sp (
+      p_traccion_id in number
+   ) is
+   begin
+      delete from fide_tracciones_tb
+       where traccion_id = p_traccion_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Tracción no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tracción con id '
+                           || p_traccion_id || ' fue eliminada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la tracción: ' || sqlerrm);
+   end tracciones_archivar_traccion_sp;
+
+    ---------------------------------------------------------------------
+    -- MARCAS VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure marcas_vehiculos_insertar_marca_sp (
+      p_marca     in varchar2,
+      p_estado_id in number
+   ) is
+      v_marca_id fide_marcas_vehiculos_tb.marca_id%type;
+   begin
+      select marcas_vehiculos_seq.nextval
+        into v_marca_id
+        from dual;
+
+      insert into fide_marcas_vehiculos_tb (
+         marca_id,
+         marca,
+         estado_id
+      ) values ( v_marca_id,
+                 p_marca,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Marca de vehículo insertada con ID: ' || v_marca_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una marca con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la marca');
+   end marcas_vehiculos_insertar_marca_sp;
+
+   procedure marcas_vehiculos_actualizar_marca_sp (
+      p_marca_id  in number,
+      p_marca     in varchar2,
+      p_estado_id in number
+   ) is
+   begin
+      update fide_marcas_vehiculos_tb
+         set marca = p_marca,
+             estado_id = p_estado_id
+       where marca_id = p_marca_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna marca con el id: ' || p_marca_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna marca con el id: ' || p_marca_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Marca '
+                           || p_marca || ' actualizada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la marca: ' || sqlerrm);
+   end marcas_vehiculos_actualizar_marca_sp;
+
+   procedure marcas_vehiculos_archivar_marca_sp (
+      p_marca_id in number
+   ) is
+   begin
+      delete from fide_marcas_vehiculos_tb
+       where marca_id = p_marca_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Marca no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Marca con id '
+                           || p_marca_id || ' fue eliminada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la marca: ' || sqlerrm);
+   end marcas_vehiculos_archivar_marca_sp;
+
+    ---------------------------------------------------------------------
+    -- MODELOS VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure modelos_vehiculos_insertar_modelo_sp (
+      p_marca_id           in number,
+      p_tipo_carroceria_id in number,
+      p_modelo             in varchar2,
+      p_estado_id          in number
+   ) is
+      v_modelo_id fide_modelos_vehiculos_tb.modelo_id%type;
+   begin
+      select modelos_vehiculos_seq.nextval
+        into v_modelo_id
+        from dual;
+
+      insert into fide_modelos_vehiculos_tb (
+         modelo_id,
+         marca_id,
+         tipo_carroceria_id,
+         modelo,
+         estado_id
+      ) values ( v_modelo_id,
+                 p_marca_id,
+                 p_tipo_carroceria_id,
+                 p_modelo,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Modelo de vehículo insertado con ID: ' || v_modelo_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un modelo con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el modelo');
+   end modelos_vehiculos_insertar_modelo_sp;
+
+   procedure modelos_vehiculos_actualizar_modelo_sp (
+      p_modelo_id          in number,
+      p_marca_id           in number,
+      p_tipo_carroceria_id in number,
+      p_modelo             in varchar2,
+      p_estado_id          in number
+   ) is
+   begin
+      update fide_modelos_vehiculos_tb
+         set marca_id = p_marca_id,
+             tipo_carroceria_id = p_tipo_carroceria_id,
+             modelo = p_modelo,
+             estado_id = p_estado_id
+       where modelo_id = p_modelo_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún modelo con el id: ' || p_modelo_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún modelo con el id: ' || p_modelo_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Modelo '
+                           || p_modelo || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el modelo: ' || sqlerrm);
+   end modelos_vehiculos_actualizar_modelo_sp;
+
+   procedure modelos_vehiculos_archivar_modelo_sp (
+      p_modelo_id in number
+   ) is
+   begin
+      delete from fide_modelos_vehiculos_tb
+       where modelo_id = p_modelo_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Modelo no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Modelo con id '
+                           || p_modelo_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el modelo: ' || sqlerrm);
+   end modelos_vehiculos_archivar_modelo_sp;
+
+    ---------------------------------------------------------------------
+    -- MOTORES
+    ---------------------------------------------------------------------
+
+   procedure motores_insertar_motor_sp (
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_potencia_hp        in number,
+      p_torque_nm          in number,
+      p_cilindraje_cc      in number,
+      p_estado_id          in number
+   ) is
+      v_motor_id fide_motores_tb.motor_id%type;
+   begin
+      select motores_seq.nextval
+        into v_motor_id
+        from dual;
+
+      insert into fide_motores_tb (
+         motor_id,
+         tipo_combustion_id,
+         nombre,
+         potencia_hp,
+         torque_nm,
+         cilindraje_cc,
+         estado_id
+      ) values ( v_motor_id,
+                 p_tipo_combustion_id,
+                 p_nombre,
+                 p_potencia_hp,
+                 p_torque_nm,
+                 p_cilindraje_cc,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Motor insertado con ID: ' || v_motor_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un motor con este ID');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el motor');
+   end motores_insertar_motor_sp;
+
+   procedure motores_actualizar_motor_sp (
+      p_motor_id           in number,
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_potencia_hp        in number,
+      p_torque_nm          in number,
+      p_cilindraje_cc      in number,
+      p_estado_id          in number
+   ) is
+   begin
+      update fide_motores_tb
+         set tipo_combustion_id = p_tipo_combustion_id,
+             nombre = p_nombre,
+             potencia_hp = p_potencia_hp,
+             torque_nm = p_torque_nm,
+             cilindraje_cc = p_cilindraje_cc,
+             estado_id = p_estado_id
+       where motor_id = p_motor_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún motor con el id: ' || p_motor_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún motor con el id: ' || p_motor_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Motor '
+                           || p_nombre || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el motor: ' || sqlerrm);
+   end motores_actualizar_motor_sp;
+
+   procedure motores_archivar_motor_sp (
+      p_motor_id in number
+   ) is
+   begin
+      delete from fide_motores_tb
+       where motor_id = p_motor_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Motor no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Motor con id '
+                           || p_motor_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el motor: ' || sqlerrm);
+   end motores_archivar_motor_sp;
+
+    ---------------------------------------------------------------------
+    -- TRANSMISIONES
+    ---------------------------------------------------------------------
+
+   procedure transmisiones_insertar_transmision_sp (
+      p_tipo_transmision_id in number,
+      p_tipo_traccion_id    in number,
+      p_nombre              in varchar2,
+      p_velocidades         in number,
+      p_estado_id           in number
+   ) is
+      v_transmision_id fide_transmisiones_tb.transmision_id%type;
+   begin
+      select transmisiones_seq.nextval
+        into v_transmision_id
+        from dual;
+
+      insert into fide_transmisiones_tb (
+         transmision_id,
+         tipo_transmision_id,
+         tipo_traccion_id,
+         nombre,
+         velocidades,
+         estado_id
+      ) values ( v_transmision_id,
+                 p_tipo_transmision_id,
+                 p_tipo_traccion_id,
+                 p_nombre,
+                 p_velocidades,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Transmisión insertada con ID: ' || v_transmision_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una transmisión con este ID');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la transmisión');
+   end transmisiones_insertar_transmision_sp;
+
+   procedure transmisiones_actualizar_transmision_sp (
+      p_transmision_id      in number,
+      p_tipo_transmision_id in number,
+      p_tipo_traccion_id    in number,
+      p_nombre              in varchar2,
+      p_velocidades         in number,
+      p_estado_id           in number
+   ) is
+   begin
+      update fide_transmisiones_tb
+         set tipo_transmision_id = p_tipo_transmision_id,
+             tipo_traccion_id = p_tipo_traccion_id,
+             nombre = p_nombre,
+             velocidades = p_velocidades,
+             estado_id = p_estado_id
+       where transmision_id = p_transmision_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna transmisión con el id: ' || p_transmision_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna transmisión con el id: ' || p_transmision_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Transmisión '
+                           || p_nombre || ' actualizada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la transmisión: ' || sqlerrm);
+   end transmisiones_actualizar_transmision_sp;
+
+   procedure transmisiones_archivar_transmision_sp (
+      p_transmision_id in number
+   ) is
+   begin
+      delete from fide_transmisiones_tb
+       where transmision_id = p_transmision_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Transmisión no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Transmisión con id '
+                           || p_transmision_id || ' fue eliminada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la transmisión: ' || sqlerrm);
+   end transmisiones_archivar_transmision_sp;
+
+    ---------------------------------------------------------------------
+    -- MODELOS VERSIONES
+    ---------------------------------------------------------------------
+
+   procedure modelos_versiones_insertar_version_sp (
+      p_modelo_id      in number,
+      p_motor_id       in number,
+      p_transmision_id in number,
+      p_nombre         in varchar2,
+      p_numero_puertas in number,
+      p_estado_id      in number
+   ) is
+      v_modelo_version_id fide_modelos_versiones_tb.modelo_version_id%type;
+   begin
+      select modelos_versiones_seq.nextval
+        into v_modelo_version_id
+        from dual;
+
+      insert into fide_modelos_versiones_tb (
+         modelo_version_id,
+         modelo_id,
+         motor_id,
+         transmision_id,
+         nombre,
+         numero_puertas,
+         estado_id
+      ) values ( v_modelo_version_id,
+                 p_modelo_id,
+                 p_motor_id,
+                 p_transmision_id,
+                 p_nombre,
+                 p_numero_puertas,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Versión de modelo insertada con ID: ' || v_modelo_version_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una versión con este ID');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la versión del modelo');
+   end modelos_versiones_insertar_version_sp;
+
+   procedure modelos_versiones_actualizar_version_sp (
+      p_modelo_version_id in number,
+      p_modelo_id         in number,
+      p_motor_id          in number,
+      p_transmision_id    in number,
+      p_nombre            in varchar2,
+      p_numero_puertas    in number,
+      p_estado_id         in number
+   ) is
+   begin
+      update fide_modelos_versiones_tb
+         set modelo_id = p_modelo_id,
+             motor_id = p_motor_id,
+             transmision_id = p_transmision_id,
+             nombre = p_nombre,
+             numero_puertas = p_numero_puertas,
+             estado_id = p_estado_id
+       where modelo_version_id = p_modelo_version_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna versión con el id: ' || p_modelo_version_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna versión con el id: ' || p_modelo_version_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Versión '
+                           || p_nombre || ' actualizada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la versión: ' || sqlerrm);
+   end modelos_versiones_actualizar_version_sp;
+
+   procedure modelos_versiones_archivar_version_sp (
+      p_modelo_version_id in number
+   ) is
+   begin
+      delete from fide_modelos_versiones_tb
+       where modelo_version_id = p_modelo_version_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Versión no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Versión con id '
+                           || p_modelo_version_id || ' fue eliminada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la versión: ' || sqlerrm);
+   end modelos_versiones_archivar_version_sp;
+
+    ---------------------------------------------------------------------
+    -- VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure vehiculos_insertar_vehiculo_sp (
+      p_placa_id          in varchar2,
+      p_cedula            in varchar2,
+      p_modelo_version_id in number,
+      p_anio_fabricacion  in number,
+      p_kilometraje       in number,
+      p_fecha_registro    in date,
+      p_estado_id         in number
+   ) is
+   begin
+      insert into fide_vehiculos_tb (
+         placa_id,
+         cedula,
+         modelo_version_id,
+         anio_fabricacion,
+         kilometraje,
+         fecha_registro,
+         estado_id
+      ) values ( p_placa_id,
+                 p_cedula,
+                 p_modelo_version_id,
+                 p_anio_fabricacion,
+                 p_kilometraje,
+                 p_fecha_registro,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Vehículo insertado con placa: ' || p_placa_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un vehículo con esta placa');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el vehículo');
+   end vehiculos_insertar_vehiculo_sp;
+
+   procedure vehiculos_actualizar_vehiculo_sp (
+      p_placa_id          in varchar2,
+      p_cedula            in varchar2,
+      p_modelo_version_id in number,
+      p_anio_fabricacion  in number,
+      p_kilometraje       in number,
+      p_estado_id         in number
+   ) is
+   begin
+      update fide_vehiculos_tb
+         set cedula = p_cedula,
+             modelo_version_id = p_modelo_version_id,
+             anio_fabricacion = p_anio_fabricacion,
+             kilometraje = p_kilometraje,
+             estado_id = p_estado_id
+       where placa_id = p_placa_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún vehículo con la placa: ' || p_placa_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún vehículo con la placa: ' || p_placa_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Vehículo con placa '
+                           || p_placa_id || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el vehículo: ' || sqlerrm);
+   end vehiculos_actualizar_vehiculo_sp;
+
+   procedure vehiculos_archivar_vehiculo_sp (
+      p_placa_id in varchar2
+   ) is
+   begin
+      delete from fide_vehiculos_tb
+       where placa_id = p_placa_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Vehículo no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Vehículo con placa '
+                           || p_placa_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el vehículo: ' || sqlerrm);
+   end vehiculos_archivar_vehiculo_sp;
+
+
    function salario_promedio_general_fn return number is
       v_promedio number;
    begin

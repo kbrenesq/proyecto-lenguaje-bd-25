@@ -348,6 +348,230 @@ create or replace package fide_smartmotriz_pkg as
       p_tipo_direccion_id in number
    );
 
+    ---------------------------------------------------------------------
+    -- TIPO CARROCERIAS
+    ---------------------------------------------------------------------
+
+   procedure tipo_carrocerias_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   );
+
+   procedure tipo_carrocerias_actualizar_tipo_sp (
+      p_tipo_carroceria_id in number,
+      p_nombre             in varchar2,
+      p_estado_id          in number
+   );
+
+   procedure tipo_carrocerias_archivar_tipo_sp (
+      p_tipo_carroceria_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- TIPO COMBUSTIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_combustiones_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   );
+
+   procedure tipo_combustiones_actualizar_tipo_sp (
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_estado_id          in number
+   );
+
+   procedure tipo_combustiones_archivar_tipo_sp (
+      p_tipo_combustion_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- TIPO TRANSMISIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_transmisiones_insertar_tipo_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   );
+
+   procedure tipo_transmisiones_actualizar_tipo_sp (
+      p_tipo_transmision_id in number,
+      p_nombre              in varchar2,
+      p_estado_id           in number
+   );
+
+   procedure tipo_transmisiones_archivar_tipo_sp (
+      p_tipo_transmision_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- TRACCIONES
+    ---------------------------------------------------------------------
+
+   procedure tracciones_insertar_traccion_sp (
+      p_nombre    in varchar2,
+      p_estado_id in number
+   );
+
+   procedure tracciones_actualizar_traccion_sp (
+      p_traccion_id in number,
+      p_nombre      in varchar2,
+      p_estado_id   in number
+   );
+
+   procedure tracciones_archivar_traccion_sp (
+      p_traccion_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- MARCAS VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure marcas_vehiculos_insertar_marca_sp (
+      p_marca     in varchar2,
+      p_estado_id in number
+   );
+
+   procedure marcas_vehiculos_actualizar_marca_sp (
+      p_marca_id  in number,
+      p_marca     in varchar2,
+      p_estado_id in number
+   );
+
+   procedure marcas_vehiculos_archivar_marca_sp (
+      p_marca_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- MODELOS VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure modelos_vehiculos_insertar_modelo_sp (
+      p_marca_id           in number,
+      p_tipo_carroceria_id in number,
+      p_modelo             in varchar2,
+      p_estado_id          in number
+   );
+
+   procedure modelos_vehiculos_actualizar_modelo_sp (
+      p_modelo_id          in number,
+      p_marca_id           in number,
+      p_tipo_carroceria_id in number,
+      p_modelo             in varchar2,
+      p_estado_id          in number
+   );
+
+   procedure modelos_vehiculos_archivar_modelo_sp (
+      p_modelo_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- MOTORES
+    ---------------------------------------------------------------------
+
+   procedure motores_insertar_motor_sp (
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_potencia_hp        in number,
+      p_torque_nm          in number,
+      p_cilindraje_cc      in number,
+      p_estado_id          in number
+   );
+
+   procedure motores_actualizar_motor_sp (
+      p_motor_id           in number,
+      p_tipo_combustion_id in number,
+      p_nombre             in varchar2,
+      p_potencia_hp        in number,
+      p_torque_nm          in number,
+      p_cilindraje_cc      in number,
+      p_estado_id          in number
+   );
+
+   procedure motores_archivar_motor_sp (
+      p_motor_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- TRANSMISIONES
+    ---------------------------------------------------------------------
+
+   procedure transmisiones_insertar_transmision_sp (
+      p_tipo_transmision_id in number,
+      p_tipo_traccion_id    in number,
+      p_nombre              in varchar2,
+      p_velocidades         in number,
+      p_estado_id           in number
+   );
+
+   procedure transmisiones_actualizar_transmision_sp (
+      p_transmision_id      in number,
+      p_tipo_transmision_id in number,
+      p_tipo_traccion_id    in number,
+      p_nombre              in varchar2,
+      p_velocidades         in number,
+      p_estado_id           in number
+   );
+
+   procedure transmisiones_archivar_transmision_sp (
+      p_transmision_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- MODELOS VERSIONES
+    ---------------------------------------------------------------------
+
+   procedure modelos_versiones_insertar_version_sp (
+      p_modelo_id      in number,
+      p_motor_id       in number,
+      p_transmision_id in number,
+      p_nombre         in varchar2,
+      p_numero_puertas in number,
+      p_estado_id      in number
+   );
+
+   procedure modelos_versiones_actualizar_version_sp (
+      p_modelo_version_id in number,
+      p_modelo_id         in number,
+      p_motor_id          in number,
+      p_transmision_id    in number,
+      p_nombre            in varchar2,
+      p_numero_puertas    in number,
+      p_estado_id         in number
+   );
+
+   procedure modelos_versiones_archivar_version_sp (
+      p_modelo_version_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- VEHICULOS
+    ---------------------------------------------------------------------
+
+   procedure vehiculos_insertar_vehiculo_sp (
+      p_placa_id          in varchar2,
+      p_cedula            in varchar2,
+      p_modelo_version_id in number,
+      p_anio_fabricacion  in number,
+      p_kilometraje       in number,
+      p_fecha_registro    in date,
+      p_estado_id         in number
+   );
+
+   procedure vehiculos_actualizar_vehiculo_sp (
+      p_placa_id          in varchar2,
+      p_cedula            in varchar2,
+      p_modelo_version_id in number,
+      p_anio_fabricacion  in number,
+      p_kilometraje       in number,
+      p_estado_id         in number
+   );
+
+   procedure vehiculos_archivar_vehiculo_sp (
+      p_placa_id in varchar2
+   );
+
    function total_mecanicos_activos_fn return number;
    function salario_promedio_general_fn return number;
    function asistencias_hoy_fn return number;
