@@ -571,8 +571,4 @@ create or replace package fide_smartmotriz_pkg as
    procedure vehiculos_archivar_vehiculo_sp (
       p_placa_id in fide_vehiculos_tb.placa_id%type
    );
-
-   function total_mecanicos_activos_fn return number;
-   function salario_promedio_general_fn return number;
-   function asistencias_hoy_fn return number;
 end fide_smartmotriz_pkg;

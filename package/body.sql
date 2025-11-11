@@ -864,18 +864,6 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
    end salarios_archivar_salario_sp;
 
-   function total_mecanicos_activos_fn return number is
-      v_total number;
-   begin
-      select count(*)
-        into v_total
-        from fide_mecanicos_tb
-       where estado_id = 1;
-      return v_total;
-   exception
-      when others then
-         return 0;
-   end total_mecanicos_activos_fn;
 
    ---------------------------------------------------------------------
     -- TIPO DIRECCIONES
@@ -2201,33 +2189,4 @@ create or replace package body fide_smartmotriz_pkg as
          rollback;
          dbms_output.put_line('Error al eliminar el vehículo: ' || sqlerrm);
    end vehiculos_archivar_vehiculo_sp;
-
-
-   function salario_promedio_general_fn return number is
-      v_promedio number;
-   begin
-      select avg(salario)
-        into v_promedio
-        from fide_salarios_tb;
-      return nvl(
-         v_promedio,
-         0
-      );
-   exception
-      when others then
-         return 0;
-   end salario_promedio_general_fn;
-
-   function asistencias_hoy_fn return number is
-      v_total number;
-   begin
-      select count(*)
-        into v_total
-        from fide_registro_asistencia_tb
-       where trunc(fecha) = trunc(sysdate);
-      return v_total;
-   exception
-      when others then
-         return 0;
-   end asistencias_hoy_fn;
 end fide_smartmotriz_pkg;
