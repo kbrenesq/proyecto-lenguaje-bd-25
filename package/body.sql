@@ -864,5 +864,470 @@ create or replace package body fide_smartmotriz_pkg as
       commit;
    end salarios_archivar_salario_sp;
 
+   function total_mecanicos_activos_fn return number is
+      v_total number;
+   begin
+      select count(*)
+        into v_total
+        from fide_mecanicos_tb
+       where estado_id = 1;
+      return v_total;
+   exception
+      when others then
+         return 0;
+   end total_mecanicos_activos_fn;
+
+   ---------------------------------------------------------------------
+    -- TIPO DIRECCIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_direcciones_insertar_tipo_sp (
+      p_tipo      in varchar2,
+      p_estado_id in number
+   ) is
+      v_tipo_direccion_id fide_tipo_direcciones_tb.tipo_direccion_id%type;
+   begin
+      select tipo_direcciones_seq.nextval
+        into v_tipo_direccion_id
+        from dual;
+
+      insert into fide_tipo_direcciones_tb (
+         tipo_direccion_id,
+         tipo,
+         estado_id
+      ) values ( v_tipo_direccion_id,
+                 p_tipo,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Tipo de dirección insertado con ID: ' || v_tipo_direccion_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un tipo de dirección con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el tipo de dirección');
+   end tipo_direcciones_insertar_tipo_sp;
+
+   procedure tipo_direcciones_actualizar_tipo_sp (
+      p_tipo_direccion_id in number,
+      p_tipo              in varchar2,
+      p_estado_id         in number
+   ) is
+   begin
+      update fide_tipo_direcciones_tb
+         set tipo = p_tipo,
+             estado_id = p_estado_id
+       where tipo_direccion_id = p_tipo_direccion_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún tipo de dirección con el id: ' || p_tipo_direccion_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún tipo de dirección con el id: ' || p_tipo_direccion_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de dirección '
+                           || p_tipo || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el tipo de dirección: ' || sqlerrm);
+   end tipo_direcciones_actualizar_tipo_sp;
+
+   procedure tipo_direcciones_archivar_tipo_sp (
+      p_tipo_direccion_id in number
+   ) is
+   begin
+      delete from fide_tipo_direcciones_tb
+       where tipo_direccion_id = p_tipo_direccion_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Tipo de dirección no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Tipo de dirección con id '
+                           || p_tipo_direccion_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el tipo de dirección: ' || sqlerrm);
+   end tipo_direcciones_archivar_tipo_sp;
+
+    ---------------------------------------------------------------------
+    -- PROVINCIAS
+    ---------------------------------------------------------------------
+
+   procedure provincias_insertar_provincia_sp (
+      p_provincia in varchar2,
+      p_estado_id in number
+   ) is
+      v_provincia_id fide_provincias_tb.provincia_id%type;
+   begin
+      select provincias_seq.nextval
+        into v_provincia_id
+        from dual;
+
+      insert into fide_provincias_tb (
+         provincia_id,
+         provincia,
+         estado_id
+      ) values ( v_provincia_id,
+                 p_provincia,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Provincia insertada con ID: ' || v_provincia_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una provincia con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la provincia');
+   end provincias_insertar_provincia_sp;
+
+   procedure provincias_actualizar_provincia_sp (
+      p_provincia_id in number,
+      p_provincia    in varchar2,
+      p_estado_id    in number
+   ) is
+   begin
+      update fide_provincias_tb
+         set provincia = p_provincia,
+             estado_id = p_estado_id
+       where provincia_id = p_provincia_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna provincia con el id: ' || p_provincia_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna provincia con el id: ' || p_provincia_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Provincia '
+                           || p_provincia || ' actualizada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la provincia: ' || sqlerrm);
+   end provincias_actualizar_provincia_sp;
+
+   procedure provincias_archivar_provincia_sp (
+      p_provincia_id in number
+   ) is
+   begin
+      delete from fide_provincias_tb
+       where provincia_id = p_provincia_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Provincia no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Provincia con id '
+                           || p_provincia_id || ' fue eliminada');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la provincia: ' || sqlerrm);
+   end provincias_archivar_provincia_sp;
+
+    ---------------------------------------------------------------------
+    -- CANTONES
+    ---------------------------------------------------------------------
+
+   procedure cantones_insertar_canton_sp (
+      p_canton       in varchar2,
+      p_provincia_id in number,
+      p_estado_id    in number
+   ) is
+      v_canton_id fide_cantones_tb.canton_id%type;
+   begin
+      select cantones_seq.nextval
+        into v_canton_id
+        from dual;
+
+      insert into fide_cantones_tb (
+         canton_id,
+         canton,
+         provincia_id,
+         estado_id
+      ) values ( v_canton_id,
+                 p_canton,
+                 p_provincia_id,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Cantón insertado con ID: ' || v_canton_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un cantón con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el cantón');
+   end cantones_insertar_canton_sp;
+
+   procedure cantones_actualizar_canton_sp (
+      p_canton_id    in number,
+      p_canton       in varchar2,
+      p_provincia_id in number,
+      p_estado_id    in number
+   ) is
+   begin
+      update fide_cantones_tb
+         set canton = p_canton,
+             provincia_id = p_provincia_id,
+             estado_id = p_estado_id
+       where canton_id = p_canton_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún cantón con el id: ' || p_canton_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún cantón con el id: ' || p_canton_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Cantón '
+                           || p_canton || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el cantón: ' || sqlerrm);
+   end cantones_actualizar_canton_sp;
+
+   procedure cantones_archivar_canton_sp (
+      p_canton_id in number
+   ) is
+   begin
+      delete from fide_cantones_tb
+       where canton_id = p_canton_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Cantón no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Cantón con id '
+                           || p_canton_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el cantón: ' || sqlerrm);
+   end cantones_archivar_canton_sp;
+
+    ---------------------------------------------------------------------
+    -- DISTRITOS
+    ---------------------------------------------------------------------
+
+   procedure distritos_insertar_distrito_sp (
+      p_distrito  in varchar2,
+      p_canton_id in number,
+      p_estado_id in number
+   ) is
+      v_distrito_id fide_distritos_tb.distrito_id%type;
+   begin
+      select distritos_seq.nextval
+        into v_distrito_id
+        from dual;
+
+      insert into fide_distritos_tb (
+         distrito_id,
+         distrito,
+         canton_id,
+         estado_id
+      ) values ( v_distrito_id,
+                 p_distrito,
+                 p_canton_id,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Distrito insertado con ID: ' || v_distrito_id);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe un distrito con este nombre');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar el distrito');
+   end distritos_insertar_distrito_sp;
+
+   procedure distritos_actualizar_distrito_sp (
+      p_distrito_id in number,
+      p_distrito    in varchar2,
+      p_canton_id   in number,
+      p_estado_id   in number
+   ) is
+   begin
+      update fide_distritos_tb
+         set distrito = p_distrito,
+             canton_id = p_canton_id,
+             estado_id = p_estado_id
+       where distrito_id = p_distrito_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ningún distrito con el id: ' || p_distrito_id);
+         raise_application_error(
+            -20001,
+            'No se encontró ningún distrito con el id: ' || p_distrito_id
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Distrito '
+                           || p_distrito || ' actualizado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar el distrito: ' || sqlerrm);
+   end distritos_actualizar_distrito_sp;
+
+   procedure distritos_archivar_distrito_sp (
+      p_distrito_id in number
+   ) is
+   begin
+      delete from fide_distritos_tb
+       where distrito_id = p_distrito_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Distrito no encontrado.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Distrito con id '
+                           || p_distrito_id || ' fue eliminado');
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar el distrito: ' || sqlerrm);
+   end distritos_archivar_distrito_sp;
+
+    ---------------------------------------------------------------------
+    -- DIRECCIONES
+    ---------------------------------------------------------------------
+
+   procedure direcciones_insertar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number,
+      p_distrito_id       in number,
+      p_otras_senas       in varchar2,
+      p_estado_id         in number
+   ) is
+   begin
+      insert into fide_direcciones_tb (
+         cedula,
+         tipo_direccion_id,
+         distrito_id,
+         otras_senas,
+         estado_id
+      ) values ( p_cedula,
+                 p_tipo_direccion_id,
+                 p_distrito_id,
+                 p_otras_senas,
+                 p_estado_id );
+
+      commit;
+      dbms_output.put_line('Dirección insertada para el usuario: ' || p_cedula);
+   exception
+      when dup_val_on_index then
+         rollback;
+         dbms_output.put_line('Ya existe una dirección de este tipo para el usuario');
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al insertar la dirección');
+   end direcciones_insertar_direccion_sp;
+
+   procedure direcciones_actualizar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number,
+      p_distrito_id       in number,
+      p_otras_senas       in varchar2,
+      p_estado_id         in number
+   ) is
+   begin
+      update fide_direcciones_tb
+         set distrito_id = p_distrito_id,
+             otras_senas = p_otras_senas,
+             estado_id = p_estado_id
+       where cedula = p_cedula
+         and tipo_direccion_id = p_tipo_direccion_id;
+
+      if sql%rowcount = 0 then
+         dbms_output.put_line('No se encontró ninguna dirección para el usuario: ' || p_cedula);
+         raise_application_error(
+            -20001,
+            'No se encontró ninguna dirección para el usuario: ' || p_cedula
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Dirección actualizada para el usuario: ' || p_cedula);
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Hubo un error al actualizar la dirección: ' || sqlerrm);
+   end direcciones_actualizar_direccion_sp;
+
+   procedure direcciones_archivar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number
+   ) is
+   begin
+      delete from fide_direcciones_tb
+       where cedula = p_cedula
+         and tipo_direccion_id = p_tipo_direccion_id;
+
+      if sql%rowcount = 0 then
+         raise_application_error(
+            -20001,
+            'Dirección no encontrada.'
+         );
+      end if;
+      commit;
+      dbms_output.put_line('Dirección eliminada para el usuario: ' || p_cedula);
+   exception
+      when others then
+         rollback;
+         dbms_output.put_line('Error al eliminar la dirección: ' || sqlerrm);
+   end direcciones_archivar_direccion_sp;
+
+   function salario_promedio_general_fn return number is
+      v_promedio number;
+   begin
+      select avg(salario)
+        into v_promedio
+        from fide_salarios_tb;
+      return nvl(
+         v_promedio,
+         0
+      );
+   exception
+      when others then
+         return 0;
+   end salario_promedio_general_fn;
+
+   function asistencias_hoy_fn return number is
+      v_total number;
+   begin
+      select count(*)
+        into v_total
+        from fide_registro_asistencia_tb
+       where trunc(fecha) = trunc(sysdate);
+      return v_total;
+   exception
+      when others then
+         return 0;
+   end asistencias_hoy_fn;
 end fide_smartmotriz_pkg;
-/

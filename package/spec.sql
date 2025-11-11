@@ -242,4 +242,113 @@ create or replace package fide_smartmotriz_pkg as
    procedure salarios_archivar_salario_sp (
       p_salario_id in number
    );
+
+   ---------------------------------------------------------------------
+    -- TIPO DIRECCIONES
+    ---------------------------------------------------------------------
+
+   procedure tipo_direcciones_insertar_tipo_sp (
+      p_tipo      in varchar2,
+      p_estado_id in number
+   );
+
+   procedure tipo_direcciones_actualizar_tipo_sp (
+      p_tipo_direccion_id in number,
+      p_tipo              in varchar2,
+      p_estado_id         in number
+   );
+
+   procedure tipo_direcciones_archivar_tipo_sp (
+      p_tipo_direccion_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- PROVINCIAS
+    ---------------------------------------------------------------------
+
+   procedure provincias_insertar_provincia_sp (
+      p_provincia in varchar2,
+      p_estado_id in number
+   );
+
+   procedure provincias_actualizar_provincia_sp (
+      p_provincia_id in number,
+      p_provincia    in varchar2,
+      p_estado_id    in number
+   );
+
+   procedure provincias_archivar_provincia_sp (
+      p_provincia_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- CANTONES
+    ---------------------------------------------------------------------
+
+   procedure cantones_insertar_canton_sp (
+      p_canton       in varchar2,
+      p_provincia_id in number,
+      p_estado_id    in number
+   );
+
+   procedure cantones_actualizar_canton_sp (
+      p_canton_id    in number,
+      p_canton       in varchar2,
+      p_provincia_id in number,
+      p_estado_id    in number
+   );
+
+   procedure cantones_archivar_canton_sp (
+      p_canton_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- DISTRITOS
+    ---------------------------------------------------------------------
+
+   procedure distritos_insertar_distrito_sp (
+      p_distrito  in varchar2,
+      p_canton_id in number,
+      p_estado_id in number
+   );
+
+   procedure distritos_actualizar_distrito_sp (
+      p_distrito_id in number,
+      p_distrito    in varchar2,
+      p_canton_id   in number,
+      p_estado_id   in number
+   );
+
+   procedure distritos_archivar_distrito_sp (
+      p_distrito_id in number
+   );
+
+    ---------------------------------------------------------------------
+    -- DIRECCIONES
+    ---------------------------------------------------------------------
+
+   procedure direcciones_insertar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number,
+      p_distrito_id       in number,
+      p_otras_senas       in varchar2,
+      p_estado_id         in number
+   );
+
+   procedure direcciones_actualizar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number,
+      p_distrito_id       in number,
+      p_otras_senas       in varchar2,
+      p_estado_id         in number
+   );
+
+   procedure direcciones_archivar_direccion_sp (
+      p_cedula            in varchar2,
+      p_tipo_direccion_id in number
+   );
+
+   function total_mecanicos_activos_fn return number;
+   function salario_promedio_general_fn return number;
+   function asistencias_hoy_fn return number;
 end fide_smartmotriz_pkg;

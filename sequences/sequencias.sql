@@ -43,3 +43,27 @@ create sequence mecanicos_seq start with 1 increment by 1 nocache nocycle;
 -- Descripción: Secuencia para generar IDs únicos para la tabla fide_salarios_tb
 -- ---------------------------------------------------------------------
 create sequence salarios_seq start with 1 increment by 1 nocache nocycle;
+
+-- ---------------------------------------------------------------------
+-- SECUENCIA: TIPO_DIRECCIONES_SEQ
+-- Descripción: Secuencia para generar IDs únicos para la tabla fide_tipo_direcciones_tb
+-- ---------------------------------------------------------------------
+create sequence tipo_direcciones_seq start with 1 increment by 1 nocache nocycle;
+
+-- ---------------------------------------------------------------------
+-- SECUENCIA: PROVINCIAS_SEQ
+-- Descripción: Secuencia para generar IDs únicos para la tabla fide_provincias_tb
+-- ---------------------------------------------------------------------
+create sequence provincias_seq start with 1 increment by 1 nocache nocycle;
+
+-- ---------------------------------------------------------------------
+-- SECUENCIA: CANTONES_SEQ
+-- Descripción: Secuencia para generar IDs únicos para la tabla fide_cantones_tb
+-- ---------------------------------------------------------------------
+create sequence cantones_seq start with 1 increment by 1 nocache nocycle;
+
+-- ---------------------------------------------------------------------
+-- SECUENCIA: DISTRITOS_SEQ
+-- Descripción: Secuencia para generar IDs únicos para la tabla fide_distritos_tb
+-- ---------------------------------------------------------------------
+create sequence distritos_seq start with 1 increment by 1 nocache nocycle;
