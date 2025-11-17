@@ -126,3 +126,42 @@ create or replace view fide_clientes_con_mas_visitas_v as
              c.segundo_apellido
     order by count(o.orden_trabajo_id) desc;
 /
+
+-- ---------------------------------------------------------------------
+-- VISTA: FIDE_TIPOS_USUARIO_POR_USUARIO_V
+-- Descripción: Vista que muestra los tipos de usuario junto con la cantidad de usuarios por tipo
+-- ---------------------------------------------------------------------
+
+create or replace view fide_tipos_usuario_por_usuario_v as
+   select u.cedula,
+          u.primer_nombre,
+          u.segundo_nombre,
+          u.primer_apellido,
+          u.segundo_apellido,
+          u.fecha_nacimiento,
+          u.estado_id,
+          listagg(tu.tipo,
+                  ', ') within group(
+           order by tu.tipo) as tipo_usuario,
+          listagg(c.correo,
+                  ', ') within group(
+           order by c.correo) as correos,
+          listagg(t.telefono,
+                  ', ') within group(
+           order by t.telefono) as telefonos
+     from fide_usuarios_tb u
+     left join fide_usuarios_por_tipo_usuario_tb ut
+   on u.cedula = ut.cedula
+     left join fide_tipo_usuarios_tb tu
+   on tu.tipo_usuario_id = ut.tipo_usuario_id
+     left join fide_correos_tb c
+   on c.cedula = u.cedula
+     left join fide_telefonos_tb t
+   on t.cedula = u.cedula
+    group by u.cedula,
+             u.primer_nombre,
+             u.segundo_nombre,
+             u.primer_apellido,
+             u.segundo_apellido,
+             u.fecha_nacimiento,
+             u.estado_id;

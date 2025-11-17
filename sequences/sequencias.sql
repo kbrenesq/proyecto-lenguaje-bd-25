@@ -20,7 +20,6 @@
 -- ---------------------------------------------------------------------
 create sequence estados_seq start with 1 increment by 1 nocache nocycle;
 
--- ---------------------------------------------------------------------
 -- SECUENCIA: TIPOS_USUARIOS_SEQ
 -- Uso: Generar IDs para la tabla FIDE_TIPO_USUARIOS_TB
 -- ---------------------------------------------------------------------
